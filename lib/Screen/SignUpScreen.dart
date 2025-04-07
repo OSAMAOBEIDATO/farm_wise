@@ -1,11 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/LoginScreen.dart';
 import 'package:farm_wise/comman/consta.dart';
 import 'package:farm_wise/components/ReusableTextField.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -15,55 +15,58 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool isLoading = false;
 
-  void signUpUser() async {
-    String res = await AuthService().signUpUser(
-        email: _emailController.text,
-        password: _passwordController.text,
-        firstName: _firstNameController.text,
-        lastName: _lastNameController.text,
-        phone: _phoneNumberController.text
+  // @override
+  // void dispose() {
+  //   _firstNameController.dispose();
+  //   _lastNameController.dispose();
+  //   _emailController.dispose();
+  //   _phoneNumberController.dispose();
+  //   _passwordController.dispose();
+  //   super.dispose();
+  // }
+
+  Future<void> _signUpUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final String res = await AuthService().signupUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+      firstName: _firstNameController.text,
+      lastName: _lastNameController.text,
+      phone: _phoneNumberController.text,
     );
 
+    setState(() {
+      isLoading = false;
+    });
+
     if (res == "Successfully") {
-      setState(() {
-        isLoading=true;
-      });
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(),
-        ),
-      );
       CustomSnackBar().ShowSnackBar(
         context: context,
-        text: "Successfully",
+        text: res,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } else {
-      setState(() {
-        isLoading=false;
-      });
       CustomSnackBar().ShowSnackBar(
         context: context,
         text: res,
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
-    _phoneNumberController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -76,7 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
+            children: [
               const SizedBox(height: 10),
               Image.asset(
                 'assets/Image/SignUpScreen.png',
@@ -145,7 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         text: "Please fill in all fields",
                       );
                     } else {
-                      signUpUser;
+                      _signUpUser();
 
                     }
                   },
@@ -155,7 +158,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     backgroundColor: Colors.grey[100],
                   ),
-                  child: Text('Sign Up', style: KTextStyle),
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.green)
+                      : Text('Sign Up', style: KTextStyle),
                 ),
               ),
               const SizedBox(height: 20),
@@ -173,9 +178,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => Loginscreen(),
-                        ),
+                        MaterialPageRoute(builder: (context) => Loginscreen()),
                       );
                     },
                     child: Text(

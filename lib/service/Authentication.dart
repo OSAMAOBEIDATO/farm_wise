@@ -1,41 +1,40 @@
-// Package imports
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farm_wise/Models/UserModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class AuthService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // SignUp User
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<String> signupUser({
     required String email,
     required String password,
     required String firstName,
-    required String phone,
-    required String lastName
+    required String lastName,
+    required String phoneNumber,
   }) async {
     String res = "Some error Occurred";
     try {
-      if (email.isNotEmpty || password.isNotEmpty || firstName.isNotEmpty ||
-          lastName.isEmpty || phone.isEmpty) {
+      if (email.isNotEmpty ||
+          password.isNotEmpty ||
+          firstName.isNotEmpty||
+          lastName.isNotEmpty|| phoneNumber.isNotEmpty) {
+
         // register user in auth with email and password
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
         // add user to your  firestore database
-        print(cred.user!.uid);
-        await _firestore.collection("users").doc(cred.user!.uid).set({
-          'First Name': firstName,
-          'Last Name': lastName,
-          'Phone': phone,
-          'uid': cred.user!.uid,
+        await _firestore.collection("users").doc(cred.user?.uid).set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'phoneNumber': phoneNumber,
           'email': email,
+          'createdAt': FieldValue.serverTimestamp(),
         });
 
-        res = "success";
+        res = "Successfully";
       }
     } catch (err) {
       return err.toString();
@@ -43,4 +42,71 @@ class AuthService {
     return res;
   }
 
+  Future<String> signInUser({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      print('Starting sign-in process for email: $email'); // Debug log
+      await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      print('Sign-in completed successfully'); // Debug log
+      return "Successfully";
+    } on FirebaseAuthException catch (e) {
+      print('Firebase Auth error during sign-in: ${e.code} - ${e.message}'); // Debug log
+      switch (e.code) {
+        case 'user-not-found':
+          return 'No user found for that email.';
+        case 'wrong-password':
+          return 'Wrong password provided.';
+        case 'invalid-email':
+          return 'The email address is badly formatted.';
+        case 'user-disabled':
+          return 'This user account has been disabled.';
+        default:
+          return e.message ?? 'An error occurred during sign-in: ${e.code}';
+      }
+    } catch (e) {
+      print('Unexpected error during sign-in: $e'); // Debug log
+      return 'An unexpected error occurred: $e';
+    }
+  }
+
+  Future<String> signOut() async {
+    try {
+      print('Starting sign-out process'); // Debug log
+      await _auth.signOut();
+      print('Sign-out completed successfully'); // Debug log
+      return "Successfully";
+    } catch (e) {
+      print('Error during sign-out: $e'); // Debug log
+      return 'Error signing out: $e';
+    }
+  }
+
+  String? getCurrentUserId() {
+    final String? userId = _auth.currentUser?.uid;
+    print('Current user ID: $userId'); // Debug log
+    return userId;
+  }
+
+
+
+  Future<UserModel?> getUserData() async {
+    final String? uid = getCurrentUserId();
+    if (uid == null) return null;
+
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) {
+        return UserModel.fromMap(uid, doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching user data: $e');
+      return null;
+    }
+  }
 }

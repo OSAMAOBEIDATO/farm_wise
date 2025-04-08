@@ -15,60 +15,78 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-
-
+  // Controllers for form fields
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // State for loading indicator
   bool isLoading = false;
 
-  // @override
-  // void dispose() {
-  //   _firstNameController.dispose();
-  //   _lastNameController.dispose();
-  //   _emailController.dispose();
-  //   _phoneNumberController.dispose();
-  //   _passwordController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _signUpUser() async {
     setState(() {
       isLoading = true;
     });
 
-    final String res = await AuthService().signupUser(
-      email: _emailController.text,
-      password: _passwordController.text,
-      firstName: _firstNameController.text,
-      lastName: _lastNameController.text,
-      phone: _phoneNumberController.text,
-    );
+    try {
+      final String res = await AuthService().signupUser(
+        email: _emailController.text,
+        password: _passwordController.text,
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        phoneNumber: _phoneNumberController.text,
+      );
 
-    setState(() {
-      isLoading = false;
-    });
+      print('Sign-up result: $res'); // Debug log to confirm result
 
-    if (res == "Successfully") {
+      setState(() {
+        isLoading = false;
+      });
+
+      if (res == "Successfully") {
+        print('Showing success SnackBar'); // Debug log
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: 'Sign-up successful!',
+        );
+        print('Navigating to HomeScreen'); // Debug log
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else {
+        print('Showing error SnackBar: $res'); // Debug log
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: res,
+        );
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Sign-up error: $e'); // Log the error for debugging
       CustomSnackBar().ShowSnackBar(
         context: context,
-        text: res,
-      );
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
-    } else {
-      CustomSnackBar().ShowSnackBar(
-        context: context,
-        text: res,
+        text: 'An unexpected error occurred: $e',
       );
     }
   }
 
+  //OSamaObeidat@gmail.com
+//OSamaa@789
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,7 +167,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       );
                     } else {
                       _signUpUser();
-
                     }
                   },
                   style: ElevatedButton.styleFrom(

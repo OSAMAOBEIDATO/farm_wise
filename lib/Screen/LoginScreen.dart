@@ -1,12 +1,19 @@
+// Dart imports
+import 'package:flutter/material.dart';
+
+// Package imports
+import 'package:google_fonts/google_fonts.dart';
+
+// Project imports
 import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/SignUpScreen.dart';
 import 'package:farm_wise/comman/consta.dart';
 import 'package:farm_wise/components/FacebookSignUp.dart';
 import 'package:farm_wise/components/ReusableTextField.dart';
 import 'package:farm_wise/components/SnakBar.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:farm_wise/service/Authentication.dart';
 
+/// A screen for users to log in with email and password.
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
 
@@ -15,15 +22,66 @@ class Loginscreen extends StatefulWidget {
 }
 
 class _LoginscreenState extends State<Loginscreen> {
-  final TextEditingController _usernameController =
-      TextEditingController(); // Renamed for consistency
+  // Controllers for form fields
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  // State for loading indicator
+  bool isLoading = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  /// Signs in the user using Firebase Authentication.
+  Future<void> _signInUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final String res = await AuthService().signInUser(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      print('Sign-in result: $res'); // Debug log to confirm result
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (res == "Successfully") {
+        print('Showing success SnackBar'); // Debug log
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: 'Login successful!',
+        );
+        print('Navigating to HomeScreen'); // Debug log
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else {
+        print('Showing error SnackBar: $res'); // Debug log
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: res,
+        );
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Sign-in error: $e'); // Log the error for debugging
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: 'An unexpected error occurred: $e',
+      );
+    }
   }
 
   @override
@@ -38,14 +96,16 @@ class _LoginscreenState extends State<Loginscreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 25),
-              Image.asset('assets/Image/loginScreen.jpg',
-                  errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.error,
-                  color: Colors.red,
-                  size: 50,
-                );
-              }),
+              Image.asset(
+                'assets/Image/loginScreen.jpg',
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.error,
+                    color: Colors.red,
+                    size: 50,
+                  );
+                },
+              ),
               const SizedBox(height: 10),
               Text(
                 'Login',
@@ -56,9 +116,10 @@ class _LoginscreenState extends State<Loginscreen> {
               ),
               const SizedBox(height: 15),
               ReusableTextField(
-                hintText: 'Username',
-                controller: _usernameController,
-                prefixIcon: Icons.person_outline,
+                hintText: 'Email',
+                controller: _emailController,
+                prefixIcon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
               ReusableTextField(
@@ -73,21 +134,14 @@ class _LoginscreenState extends State<Loginscreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_usernameController.text.isEmpty ||
+                    if (_emailController.text.isEmpty ||
                         _passwordController.text.isEmpty) {
                       CustomSnackBar().ShowSnackBar(
                         context: context,
                         text: "Please fill in all fields",
                       );
                     } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
-                        ),
-                      );
-                      print(
-                          'Username: ${_usernameController.text}, Password: ${_passwordController.text}');
+                      _signInUser();
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -96,12 +150,12 @@ class _LoginscreenState extends State<Loginscreen> {
                     ),
                     backgroundColor: Colors.grey[100],
                   ),
-                  child: Text('Sign In', style: KTextStyle),
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.green)
+                      : Text('Sign In', style: KTextStyle),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
@@ -111,7 +165,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
                       "Or",
                       style: KTextStyle,

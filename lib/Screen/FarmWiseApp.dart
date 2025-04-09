@@ -14,7 +14,7 @@ class FarmWiseApp extends StatelessWidget {
           primarySwatch: Colors.green,
           useMaterial3: true
       ),
-      home:  const SpalshScreen(),
+      home:  const SpalshScreen(userId: id,),
     );
   }
 }

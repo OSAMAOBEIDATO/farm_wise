@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 class SpalshScreen extends StatefulWidget {
   static const String id = 'SpalshScreen';
-  const SpalshScreen({super.key});
+  final String userId;
+
+  const SpalshScreen({super.key, required this.userId});
 
   @override
   State<SpalshScreen> createState() => _SpalshScreenState();
@@ -18,7 +20,7 @@ class _SpalshScreenState extends State<SpalshScreen> {
           () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>Loginscreen()),
+          MaterialPageRoute(builder: (context) =>LoginScreen(userId: widget.userId,)),
         );
       },
     );

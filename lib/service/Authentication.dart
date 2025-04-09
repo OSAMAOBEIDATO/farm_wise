@@ -36,8 +36,19 @@ class AuthService {
 
         res = "Successfully";
       }
-    } catch (err) {
-      return err.toString();
+    } on FirebaseAuthException catch (err) {
+      switch (err.code) {
+        case 'email-already-in-use':
+          return 'The email address is already in use by another account.';
+        case 'invalid-email':
+          return 'The email address is badly formatted.';
+        case 'weak-password':
+          return 'The password must be at least 6 characters long.';
+        case 'operation-not-allowed':
+          return 'Email/password accounts are not enabled in Firebase Authentication.';
+        default:
+          return err.message ?? 'An error occurred during sign-up: ${err.code}';
+      }
     }
     return res;
   }
@@ -58,15 +69,19 @@ class AuthService {
       print('Firebase Auth error during sign-in: ${e.code} - ${e.message}'); // Debug log
       switch (e.code) {
         case 'user-not-found':
-          return 'No user found for that email.';
+          return 'No account exists with this email. Please sign up.';
         case 'wrong-password':
-          return 'Wrong password provided.';
+          return 'Incorrect password. Please try again.';
         case 'invalid-email':
-          return 'The email address is badly formatted.';
+          return 'The email address is not valid. Please check and try again.';
+        case 'invalid-credential':
+          return 'Invalid email or password. Please check your credentials and try again.';
         case 'user-disabled':
-          return 'This user account has been disabled.';
+          return 'This account has been disabled. Please contact support.';
+        case 'too-many-requests':
+          return 'Too many login attempts. Please try again later.';
         default:
-          return e.message ?? 'An error occurred during sign-in: ${e.code}';
+          return 'An error occurred during sign-in. Please try again.';
       }
     } catch (e) {
       print('Unexpected error during sign-in: $e'); // Debug log

@@ -14,15 +14,17 @@ import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
 
 /// A screen for users to log in with email and password.
-class Loginscreen extends StatefulWidget {
-  static const  String id="Loginscreen";
-  const Loginscreen({super.key});
+class LoginScreen extends StatefulWidget {
+  static const String id = "Loginscreen";
+  final String userId;
+
+  const LoginScreen({super.key, required this.userId});
 
   @override
-  State<Loginscreen> createState() => _LoginscreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginscreenState extends State<Loginscreen> {
+class _LoginScreenState extends State<LoginScreen> {
   // Controllers for form fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -64,7 +66,7 @@ class _LoginscreenState extends State<Loginscreen> {
         print('Navigating to HomeScreen'); // Debug log
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen(userId: widget.userId,)),
         );
       } else {
         print('Showing error SnackBar: $res'); // Debug log
@@ -198,7 +200,7 @@ class _LoginscreenState extends State<Loginscreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SignUpScreen(),
+                          builder: (context) =>  SignUpScreen(userId: widget.userId,),
                         ),
                       );
                     },

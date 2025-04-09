@@ -8,8 +8,9 @@ import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
 
 class SignUpScreen extends StatefulWidget {
-  static const String id = 'SignUpScreen';
-  const SignUpScreen({super.key});
+  static const String id = "HomeScreen";
+  final String userId;
+  const SignUpScreen({super.key, required this.userId});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -65,7 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         print('Navigating to HomeScreen'); // Debug log
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen(userId: widget.userId,)),
         );
       } else {
         print('Showing error SnackBar: $res'); // Debug log
@@ -196,7 +197,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Loginscreen()),
+                        MaterialPageRoute(builder: (context) => LoginScreen(userId: widget.userId,)),
                       );
                     },
                     child: Text(

@@ -3,6 +3,7 @@ import 'package:farm_wise/service/Authentication.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
+  static const String id = 'ProfileScreen';
   const ProfileScreen({super.key});
 
   @override

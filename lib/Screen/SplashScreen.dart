@@ -2,6 +2,7 @@ import 'package:farm_wise/Screen/LoginScreen.dart';
 import 'package:flutter/material.dart';
 
 class SpalshScreen extends StatefulWidget {
+  static const String id = 'SpalshScreen';
   const SpalshScreen({super.key});
 
   @override

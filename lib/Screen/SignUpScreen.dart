@@ -8,6 +8,7 @@ import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
 
 class SignUpScreen extends StatefulWidget {
+  static const String id = 'SignUpScreen';
   const SignUpScreen({super.key});
 
   @override

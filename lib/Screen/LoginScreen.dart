@@ -15,6 +15,7 @@ import 'package:farm_wise/service/Authentication.dart';
 
 /// A screen for users to log in with email and password.
 class Loginscreen extends StatefulWidget {
+  static const  String id="Loginscreen";
   const Loginscreen({super.key});
 
   @override

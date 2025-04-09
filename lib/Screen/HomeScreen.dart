@@ -1,9 +1,11 @@
+import 'package:farm_wise/Screen/ProfileScreen.dart';
 import 'package:farm_wise/comman/consta.dart';
 import 'package:farm_wise/components/CardWeatherTile.dart';
 import 'package:flutter/material.dart';
 
 // Home Screen (Weather Today)
 class HomeScreen extends StatelessWidget {
+  static const  String id="HomeScreen";
   const HomeScreen({super.key});
 
   @override
@@ -69,8 +71,8 @@ class HomeScreen extends StatelessWidget {
                     value: 'Healthy',
                     label: 'Crop Health',
                     iconColor: Colors.green,
-                  ),
-                ],
+                  ),//OsamaSalamhObeidat1@gmail.com
+                ],//Osama123123
               ),
             ],
           ),

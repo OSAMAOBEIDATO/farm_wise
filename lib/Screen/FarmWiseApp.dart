@@ -2,6 +2,7 @@ import 'package:farm_wise/Screen/SplashScreen.dart';
 import 'package:flutter/material.dart';
 
 class FarmWiseApp extends StatelessWidget {
+  static const  String id="FarmWiseApp";
   const FarmWiseApp({super.key});
 
   @override

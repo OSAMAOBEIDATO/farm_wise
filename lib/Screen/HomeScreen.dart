@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FarmWise Dashboard'),
+        title: const Text('FarmWise'),
         backgroundColor: Colors.green,
         actions: [
           IconButton(

@@ -59,7 +59,7 @@ class _AddCropScreenState extends State<AddCropScreen> {
   }
 
   Future<void> _addSelectedCrops() async {
-    if (_selectedCropNames.isEmpty) {
+    if (!_selectedCropNames.isEmpty) {
       CustomSnackBar().ShowSnackBar(
         context: context,
         text: 'Please select at least one crop.',
@@ -71,11 +71,10 @@ class _AddCropScreenState extends State<AddCropScreen> {
       _isLoading = true;
     });
 
-    // Find the selected CropData objects to get their full details
     final selectedCrops = _crops
         .where(
           (crop) => _selectedCropNames.contains(crop.cropName),
-        )
+    )
         .toList();
 
     final now = DateTime.now();
@@ -147,82 +146,82 @@ class _AddCropScreenState extends State<AddCropScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Select the crops that you grow. You can define varieties later.',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search',
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: _filteredCrops.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'No crops found. Add crops on the next screen.',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: _filteredCrops.length,
-                            itemBuilder: (context, index) {
-                              final crop = _filteredCrops[index];
-                              final isSelected =
-                                  _selectedCropNames.contains(crop.cropName);
-                              return CheckboxListTile(
-                                title: Text(crop.cropName),
-                                value: isSelected,
-                                onChanged: (bool? value) {
-                                  _toggleCropSelection(crop.cropName);
-                                },
-                                activeColor: Colors.green,
-                                checkColor: Colors.white,
-                              );
-                            },
-                          ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Crops selected: ${_selectedCropNames.isEmpty ? 'None' : _selectedCropNames.join(', ')}',
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _addSelectedCrops,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'NEXT',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                ],
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Select the crops that you grow. You can define varieties later.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search',
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
               ),
             ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: _filteredCrops.isEmpty
+                  ? const Center(
+                child: Text(
+                  'No crops found. Add crops on the next screen.',
+                  style:
+                  TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: _filteredCrops.length,
+                itemBuilder: (context, index) {
+                  final crop = _filteredCrops[index];
+                  final isSelected =
+                  _selectedCropNames.contains(crop.cropName);
+                  return CheckboxListTile(
+                    title: Text(crop.cropName),
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      _toggleCropSelection(crop.cropName);
+                    },
+                    activeColor: Colors.green,
+                    checkColor: Colors.white,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Crops selected: ${_selectedCropNames.isEmpty ? 'None' : _selectedCropNames.join(', ')}',
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _addSelectedCrops,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'NEXT',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -33,9 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
       // Home screen content (current weather view)
       _buildHomeContent(),
       CropsScreen(userId: widget.userId),
-      DiseaseScreen(userId: widget.userId),
+      CropDiseaseDetectionScreen(userId: widget.userId),
       CropCalendarScreen(userId: widget.userId,),
-      ProfileScreen(userId: widget.userId),
+      ProfilePage(userId: widget.userId),
     ];
   }
 

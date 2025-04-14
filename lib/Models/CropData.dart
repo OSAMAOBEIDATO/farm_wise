@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CropModel {
+class CropData {
   final String cropId;
   final String userId;
   final String cropName;
   final DateTime harvestDate;
   final DateTime plantDate;
   final String plantType;
-  final List<String> fertilizers;
-  final List<String> pesticides;
+  final List<dynamic> fertilizers;
+  final List<dynamic> pesticides;
+  final DateTime createdAt; // Add createdAt field
 
-  CropModel({
+  CropData({
     required this.cropId,
     required this.userId,
     required this.cropName,
@@ -19,6 +20,7 @@ class CropModel {
     required this.plantType,
     required this.fertilizers,
     required this.pesticides,
+    required this.createdAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -30,11 +32,12 @@ class CropModel {
       'plantType': plantType,
       'fertilizers': fertilizers,
       'pesticides': pesticides,
+      'createdAt': createdAt, // Include in map
     };
   }
 
-  factory CropModel.fromMap(String cropId, Map<String, dynamic> map) {
-    return CropModel(
+  factory CropData.fromMap(String cropId, Map<String, dynamic> map) {
+    return CropData(
       cropId: cropId,
       userId: map['userId'] ?? '',
       cropName: map['cropName'] ?? '',
@@ -43,6 +46,7 @@ class CropModel {
       plantType: map['plantType'] ?? '',
       fertilizers: List<String>.from(map['fertilizers'] ?? []),
       pesticides: List<String>.from(map['pesticides'] ?? []),
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(), // Add createdAt
     );
   }
 }

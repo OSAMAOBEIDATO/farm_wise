@@ -22,13 +22,15 @@ class ReusableTextField extends StatefulWidget {
 }
 
 class _ReusableTextFieldState extends State<ReusableTextField> {
-  bool _isPasswordVisible = true; // Default to hidden (obscured) for password fields
+  bool _isPasswordVisible =
+      true; // Default to hidden (obscured) for password fields
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,
-      obscureText: widget.isPasswordField ? _isPasswordVisible : false, // Only obscure text for password fields
+      obscureText: widget.isPasswordField ? _isPasswordVisible : false,
+      // Only obscure text for password fields
       keyboardType: widget.keyboardType,
       decoration: InputDecoration(
         prefixIcon: Icon(
@@ -41,16 +43,17 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
         fillColor: Colors.grey[100],
         suffixIcon: widget.isPasswordField
             ? IconButton(
-          onPressed: () {
-            setState(() {
-              _isPasswordVisible = !_isPasswordVisible;
-            });
-          },
-          icon: _isPasswordVisible
-              ? const Icon(Icons.visibility_off)
-              : const Icon(Icons.visibility),
-        )
-            : null, // Show suffixIcon only for password fields
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+                icon: _isPasswordVisible
+                    ? const Icon(Icons.visibility_off)
+                    : const Icon(Icons.visibility),
+              )
+            : null,
+        // Show suffixIcon only for password fields
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,

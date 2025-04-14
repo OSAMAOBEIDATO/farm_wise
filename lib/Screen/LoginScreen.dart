@@ -1,4 +1,5 @@
 // Dart imports
+import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
 
 // Package imports
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print('Navigating to HomeScreen'); // Debug log
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen(userId: widget.userId,)),
+          MaterialPageRoute(builder: (context) => AddCropScreen(userId: widget.userId,)),
         );
       } else {
         print('Showing error SnackBar: $res'); // Debug log

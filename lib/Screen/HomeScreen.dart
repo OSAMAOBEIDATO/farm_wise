@@ -10,6 +10,10 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatefulWidget {
   static const String id = "HomeScreen";
   final String userId;
+  //TODO: Auth Facbook and Apple
+  //TODO:Add Search screen
+  //TODO:Profile Screen
+  // TODO:Home Screen
 
   const HomeScreen({super.key, required this.userId});
 
@@ -67,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   label: 'Partially sunny',
                   iconColor: Colors.orange,
                 ),
-                CardWeatherTile(
+                CardWeatherTile(// TODO ADD CROP FOR FIREBASE
                   icon: Icons.cloud,
                   value: '10%',
                   label: 'Precipitation',

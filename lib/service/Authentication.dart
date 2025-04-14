@@ -6,6 +6,42 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  String? validPassword(String password){
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long.';
+    }
+    if(!RegExp(r'[A-Z]').hasMatch(password)) {
+      return 'Password must contain at least one uppercase letter.';
+    }
+    if(!RegExp(r'[a-z]').hasMatch(password)){
+      return 'Password must contain at least one lowercase letter.';
+    }
+    if(!RegExp(r'[1-9]').hasMatch(password)){
+      return 'Password must contain at least one number.';
+    }
+    if(!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)){
+      return 'Password must contain at least one special character.';
+    }
+    return null;
+  }
+
+
+  String? validateEmailDomain(String email){
+    if(!email.endsWith("@gmail.com")){
+      return 'Only Gmail addresses are allowed (e.g., user@gmail.com).';
+    }
+  }
+
+  String? validatePhoneNumber(String phoneNumber){
+    if (!RegExp(r'^\d+$').hasMatch(phoneNumber)) {
+      return 'Phone number must contain only digits (0-9).';
+    }
+    if(phoneNumber.length!=10){
+      return 'Phone number must be 10 digits.';
+    }
+  }
+
+
   Future<String> signupUser({
     required String email,
     required String password,
@@ -20,6 +56,18 @@ class AuthService {
           firstName.isNotEmpty||
           lastName.isNotEmpty|| phoneNumber.isNotEmpty) {
 
+        final passwordError=validPassword(password);
+        if(passwordError!=null){
+          return Future.value(passwordError);
+        }
+        final emailError=validateEmailDomain(email);
+        if(emailError!=null) {
+          return Future.value(emailError);
+        }
+        final phoneError=validatePhoneNumber(phoneNumber);
+        if(phoneError!=null){
+          return Future.value(phoneError);
+        }
         // register user in auth with email and password
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
           email: email,
@@ -41,11 +89,11 @@ class AuthService {
         case 'email-already-in-use':
           return 'The email address is already in use by another account.';
         case 'invalid-email':
-          return 'The email address is badly formatted.';
+          return 'Hmm, that doesn’t look like a valid email. Can you double-check it.';
         case 'weak-password':
-          return 'The password must be at least 6 characters long.';
+          return 'The password must be at least 8 characters long.';
         case 'operation-not-allowed':
-          return 'Email/password accounts are not enabled in Firebase Authentication.';
+          return 'Oops! Sign-ups using email and password are currently disabled.';
         default:
           return err.message ?? 'An error occurred during sign-up: ${err.code}';
       }

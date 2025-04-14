@@ -1,3 +1,4 @@
+import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:farm_wise/Screen/HomeScreen.dart';
@@ -58,22 +59,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
 
       if (res == "Successfully") {
-        print('Showing success SnackBar'); // Debug log
-        CustomSnackBar().ShowSnackBar(
-          context: context,
-          text: 'Sign-up successful!',
-        );
         print('Navigating to HomeScreen'); // Debug log
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen(userId: widget.userId,)),
+          MaterialPageRoute(builder: (context) => AddCropScreen(userId: widget.userId,)),
         );
       } else {
         print('Showing error SnackBar: $res'); // Debug log
-        CustomSnackBar().ShowSnackBar(
-          context: context,
-          text: res,
-        );
+
       }
     } catch (e) {
       setState(() {

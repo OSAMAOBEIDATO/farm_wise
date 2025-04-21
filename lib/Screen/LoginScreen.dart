@@ -1,12 +1,7 @@
-// Dart imports
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
-
-// Package imports
 import 'package:google_fonts/google_fonts.dart';
-
-// Project imports
-import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/SignUpScreen.dart';
 import 'package:farm_wise/comman/consta.dart';
 import 'package:farm_wise/components/FacebookSignUp.dart';
@@ -64,10 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
           context: context,
           text: 'Login successful!',
         );
-        print('Navigating to HomeScreen'); // Debug log
+        print('Navigating to SearchCropScreen'); // Debug log
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AddCropScreen(userId: widget.userId,)),
+          MaterialPageRoute(
+            builder: (context) => SearchCropScreen(userId: widget.userId)
+          ),
         );
       } else {
         print('Showing error SnackBar: $res'); // Debug log
@@ -81,6 +78,82 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
       print('Sign-in error: $e'); // Log the error for debugging
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: 'An unexpected error occurred: $e',
+      );
+    }
+  }
+
+  /// Handles Facebook sign-up and navigates accordingly.
+  Future<void> _signUpWithFacebook() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final String result = await AuthService().signUpWithFacebook();
+
+      print('Facebook sign-up result: $result'); // Debug log to confirm result
+
+      setState(() {
+        isLoading = false;
+      });
+
+      // Check if we need to prompt for email
+      if (result.startsWith('PromptForEmail')) {
+        print('Received PromptForEmail result: $result'); // Debug log
+        // Since email is required but cannot be retrieved, sign out and show an error
+        await AuthService().signOut();
+        print('Signed out due to missing email'); // Debug log
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: 'Unable to retrieve email from Facebook. Please use email sign-up instead.',
+        );
+        return;
+      }
+
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: result == "Successfully" ? 'Signed up with Facebook successfully!' : result,
+      );
+
+      if (result == "Successfully") {
+        final String? userId = AuthService().getCurrentUserId();
+        if (userId == null) {
+          CustomSnackBar().ShowSnackBar(
+            context: context,
+            text: 'Failed to retrieve user ID after sign-up.',
+          );
+          return;
+        }
+
+        // Check if the user needs to provide a phone number
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+        final userData = userDoc.data();
+        if (userData != null && userData['phoneNumber'] == null) {
+          // Navigate to phone number prompt screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchCropScreen(userId: userId),
+            ),
+          );
+        } else {
+          // Navigate directly to SearchCropScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchCropScreen(userId: userId),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Facebook sign-up error: $e');
       CustomSnackBar().ShowSnackBar(
         context: context,
         text: 'An unexpected error occurred: $e',
@@ -132,7 +205,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 prefixIcon: Icons.lock_outline,
                 isPasswordField: true,
               ),
-              const SizedBox(height: 50),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Forget Password?",
+                    style: TextStyle(color: Colors.green[500]),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               SizedBox(
                 height: 55,
                 width: double.infinity,
@@ -184,7 +267,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              SignInWithFacebook(logInOrSignIn: "Sign Up", onTap: () {}),
+              SignInWithFacebook(
+                logInOrSignIn: "Sign Up",
+                onTap: _signUpWithFacebook,
+              ),
               const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -201,14 +287,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>  SignUpScreen(userId: widget.userId,),
+                          builder: (context) => SignUpScreen(
+                            userId: widget.userId,
+                          ),
                         ),
                       );
                     },
                     child: Text(
                       'SignUp',
                       style: GoogleFonts.adamina(
-                        fontSize: 20,
+                        fontSize: 25,
                         color: Colors.green[900],
                       ),
                     ),

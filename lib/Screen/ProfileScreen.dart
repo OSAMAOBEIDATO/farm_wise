@@ -1,157 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:farm_wise/Screen/SignUpScreen.dart';
 
-// Helper widget for building list tiles (frontend only)
-Widget _buildListTile(BuildContext context, {required String title, required VoidCallback onTap, Color? textColor}) {
-  return ListTile(
-    title: Text(
-      title,
-      style: TextStyle(
-        fontSize: 16,
-        color: textColor ?? Colors.black,
-      ),
-    ),
-    trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-    onTap: onTap,
-  );
-}
-
-class ProfilePage extends StatelessWidget {
-  static const String id = "ProfilePage";
-  final String userId; // Kept for consistency, but not used in frontend
-
-  const ProfilePage({super.key, required this.userId});
+class ProfileScreen extends StatelessWidget {
+  static const String id = "ProfileScreen";
+  final String userId;
+  const ProfileScreen({super.key,required this.userId});
 
   @override
   Widget build(BuildContext context) {
-    // Hardcoded placeholder data for frontend display
-    const String name = 'User';
-    const String email = 'user@example.com';
-
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        backgroundColor: Colors.grey[50],
+        elevation: 0,
+        toolbarHeight: 0, // hides appbar space
+      ),
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 40),
-            const Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.green,
-                child: Icon(Icons.person, size: 60, color: Colors.white),
-              ),
-            ),
             const SizedBox(height: 20),
-            Center(
-              child: Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+            // Avatar Circle
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.green[900],
+              child: const Text(
+                'O',
+                style: TextStyle(fontSize: 40, color: Colors.white),
               ),
             ),
-            const SizedBox(height: 5),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.email, color: Colors.grey, size: 16),
-                  const SizedBox(width: 5),
-                  Text(
-                    email,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 16),
+            // Name
+            const Text(
+              'Ibraheem Jardat',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            // Email Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.email, color: Colors.green[900]),
+                const SizedBox(width: 6),
+                const Text('ibraheem.b@gmail.com'),
+              ],
             ),
             const SizedBox(height: 30),
-            Expanded(
-              child: ListView(
-                children: [
-                  _buildListTile(
-                    context,
-                    title: 'Account settings',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feature coming soon!')),
-                      );
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    title: 'Crop options',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feature coming soon!')),
-                      );
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    title: 'Notification management',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feature coming soon!')),
-                      );
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    title: 'Account security',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feature coming soon!')),
-                      );
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    title: 'Help & Support',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feature coming soon!')),
-                      );
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    title: 'About FarmWise',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feature coming soon!')),
-                      );
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    title: 'Share the FarmWise app',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Feature coming soon!')),
-                      );
-                    },
-                  ),
-                  _buildListTile(
-                    context,
-                    title: 'Logout',
-                    onTap: () {
-                      // Navigate to SignUpScreen without backend logic
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SignUpScreen(userId: '')),
-                            (route) => false,
-                      );
-                    },
-                    textColor: Colors.red,
-                  ),
-                ],
-              ),
-            ),
+
+            // Section: Account Settings
+            sectionTitle('Account settings'),
+            customListTile('Crop options', Icons.chevron_right, () {
+              // TODO: Handle navigation
+            }),
+            customListTile('Notification management', Icons.chevron_right, () {
+              // TODO: Handle navigation
+            }),
+            customListTile('Account security', Icons.chevron_right, () {
+              // TODO: Handle navigation
+            }),
+
+            const SizedBox(height: 30),
+
+            // Section: Help and Support
+            sectionTitle('Help and Support'),
+            customListTile('About FarmWise', Icons.chevron_right, () {
+              // TODO: Handle navigation
+            }),
+            customListTile('Share the FarmWise app', Icons.chevron_right, () {
+              // TODO: Handle navigation
+            }),
           ],
         ),
       ),
+
+      // Bottom Nav Bar
+
+    );
+  }
+
+  // Helper: Section Title
+  Widget sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style:
+          const TextStyle(
+              fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  // Helper: Custom List Tile
+  Widget customListTile(String title, IconData icon, VoidCallback onTap) {
+    return ListTile(
+      title: Text(title),
+      trailing: Icon(icon, color: Colors.black),
+      onTap: onTap,
     );
   }
 }

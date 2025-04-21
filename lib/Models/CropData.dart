@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CropData {
@@ -6,21 +7,24 @@ class CropData {
   final String cropName;
   final DateTime harvestDate;
   final DateTime plantDate;
-  final String plantType;
+  final String soilType;
   final List<dynamic> fertilizers;
   final List<dynamic> pesticides;
-  final DateTime createdAt; // Add createdAt field
+  final String? imageUrl; // Make imageUrl optional
+  final DateTime createdAt;
 
   CropData({
     required this.cropId,
     required this.userId,
     required this.cropName,
+    //required this Grwing Time  TODO
     required this.harvestDate,
     required this.plantDate,
-    required this.plantType,
+    required this.soilType,
     required this.fertilizers,
     required this.pesticides,
     required this.createdAt,
+    this.imageUrl, // Not required
   });
 
   Map<String, dynamic> toMap() {
@@ -29,10 +33,11 @@ class CropData {
       'cropName': cropName,
       'harvestDate': harvestDate,
       'plantDate': plantDate,
-      'plantType': plantType,
+      'plantType': soilType,
       'fertilizers': fertilizers,
       'pesticides': pesticides,
-      'createdAt': createdAt, // Include in map
+      'createdAt': createdAt,
+      'imageUrl': imageUrl, // Include imageUrl
     };
   }
 
@@ -43,10 +48,11 @@ class CropData {
       cropName: map['cropName'] ?? '',
       harvestDate: (map['harvestDate'] as Timestamp).toDate(),
       plantDate: (map['plantDate'] as Timestamp).toDate(),
-      plantType: map['plantType'] ?? '',
+      soilType: map['plantType'] ?? '',
       fertilizers: List<String>.from(map['fertilizers'] ?? []),
       pesticides: List<String>.from(map['pesticides'] ?? []),
-      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(), // Add createdAt
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      imageUrl: map['imageUrl'] as String?, // Parse imageUrl
     );
   }
 }

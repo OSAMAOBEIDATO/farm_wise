@@ -1,51 +1,14 @@
-import 'package:farm_wise/Screen/CropCalendarScreen.dart';
-import 'package:farm_wise/Screen/CropsScreen.dart';
-import 'package:farm_wise/Screen/DiseaseScreen.dart';
-import 'package:farm_wise/Screen/LoginScreen.dart';
-import 'package:farm_wise/Screen/ProfileScreen.dart';
-import 'package:farm_wise/components/CardWeatherTile.dart';
-import 'package:farm_wise/service/Authentication.dart';
+// HomeScreen.dart
 import 'package:flutter/material.dart';
+import 'package:farm_wise/components/CardWeatherTile.dart';
 
-class HomeScreen extends StatefulWidget {
-  static const String id = "HomeScreen";
+class HomeScreen extends StatelessWidget {
   final String userId;
-  //TODO: Auth Facbook and Apple
-  //TODO:Add Search screen
-  //TODO:Profile Screen
-  // TODO:Home Screen
 
   const HomeScreen({super.key, required this.userId});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-  late List<Widget> _screens;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the list of screens to display
-    _screens = [
-      // Home screen content (current weather view)
-      _buildHomeContent(),
-      CropsScreen(userId: widget.userId),
-      CropDiseaseDetectionScreen(userId: widget.userId),
-      CropCalendarScreen(userId: widget.userId,),
-      ProfilePage(userId: widget.userId),
-    ];
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  Widget _buildHomeContent() {
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
@@ -64,14 +27,14 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               childAspectRatio: 1,
-              children: [
+              children:  [
                 CardWeatherTile(
                   icon: Icons.wb_sunny,
                   value: '13°C',
                   label: 'Partially sunny',
                   iconColor: Colors.orange,
                 ),
-                CardWeatherTile(// TODO ADD CROP FOR FIREBASE
+                CardWeatherTile(
                   icon: Icons.cloud,
                   value: '10%',
                   label: 'Precipitation',
@@ -105,58 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('FarmWise'),
-        backgroundColor: Colors.green,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await AuthService().signOut();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) =>  LoginScreen(userId: widget.userId,)),
-              );
-            },
-          ),
-        ],
-      ),
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_florist),
-            label: 'Crops',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt),
-            label: 'Disease',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
       ),
     );
   }

@@ -62,7 +62,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         print('Navigating to HomeScreen'); // Debug log
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AddCropScreen(userId: widget.userId,)),
+          MaterialPageRoute(builder: (context) => SearchCropScreen(userId: widget.userId,)),
         );
       } else {
         print('Showing error SnackBar: $res'); // Debug log
@@ -133,17 +133,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 15),
               ReusableTextField(
-                hintText: 'PhoneNumber',
-                controller: _phoneNumberController,
-                prefixIcon: Icons.phone,
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 15),
-              ReusableTextField(
                 hintText: 'Password',
                 controller: _passwordController,
                 prefixIcon: Icons.lock_outline,
                 isPasswordField: true,
+              ),
+              const SizedBox(height: 15),
+              ReusableTextField(
+                hintText: 'PhoneNumber',
+                controller: _phoneNumberController,
+                prefixIcon: Icons.phone,
+                keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 40),
               SizedBox(
@@ -196,7 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Text(
                       'Login',
                       style: GoogleFonts.adamina(
-                        fontSize: 20,
+                        fontSize: 25,
                         color: Colors.green[900],
                       ),
                     ),

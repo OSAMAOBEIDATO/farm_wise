@@ -4,14 +4,10 @@ import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/CropCalendarScreen.dart';
 import 'package:farm_wise/Screen/DiseaseScreen.dart';
 import 'package:farm_wise/Screen/ProfileScreen.dart';
-import 'package:farm_wise/Screen/LoginScreen.dart';
-import 'package:farm_wise/service/Authentication.dart';
 
 class MainScreen extends StatefulWidget {
-  static const String id = "MainScreen";
-  final String userId;
 
-  const MainScreen({super.key, required this.userId});
+  const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -26,10 +22,10 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _screens = [
-      HomeScreen(userId: widget.userId),
-      CropDiseaseDetectionScreen(userId: widget.userId),
-      CropCalendarScreen(userId: widget.userId),
-      ProfileScreen(userId: widget.userId),
+      HomeScreen(),
+      CropDiseaseDetectionScreen(),
+      CropCalendarScreen(),
+      ProfileScreen(),
     ];
   }
 

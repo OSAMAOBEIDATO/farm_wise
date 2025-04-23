@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CropDiseaseDetectionScreen extends StatelessWidget {
- static const String id = "CropDiseaseDetectionScreen";
-  final String userId; // Kept for consistency, but not used
 
-  const CropDiseaseDetectionScreen({super.key, required this.userId});
+  const CropDiseaseDetectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

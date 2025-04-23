@@ -1,3 +1,4 @@
+import 'package:farm_wise/Screen/CropDetails.dart';
 import 'package:farm_wise/Screen/SplashScreen.dart';
 import 'package:flutter/material.dart';
 

@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farm_wise/Screen/HomeScreen.dart';
+import 'package:farm_wise/Screen/MainScreen.dart';
 import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,10 +13,8 @@ import 'package:farm_wise/service/Authentication.dart';
 
 /// A screen for users to log in with email and password.
 class LoginScreen extends StatefulWidget {
-  static const String id = "Loginscreen";
-  final String userId;
 
-  const LoginScreen({super.key, required this.userId});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => SearchCropScreen(userId: widget.userId)
+            builder: (context) => MainScreen()
           ),
         );
       } else {
@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final String result = await AuthService().signUpWithFacebook();
 
-      print('Facebook sign-up result: $result'); // Debug log to confirm result
+      print('Facebook sign-up result: $result');
 
       setState(() {
         isLoading = false;
@@ -102,21 +102,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Check if we need to prompt for email
       if (result.startsWith('PromptForEmail')) {
-        print('Received PromptForEmail result: $result'); // Debug log
-        // Since email is required but cannot be retrieved, sign out and show an error
-        await AuthService().signOut();
-        print('Signed out due to missing email'); // Debug log
-        CustomSnackBar().ShowSnackBar(
-          context: context,
-          text: 'Unable to retrieve email from Facebook. Please use email sign-up instead.',
+        print('Received PromptForEmail result: $result');
+        final String? userId = AuthService().getCurrentUserId();
+        if (userId == null) {
+          await AuthService().signOut();
+          CustomSnackBar().ShowSnackBar(
+            context: context,
+            text: 'Facebook login failed: Unable to retrieve user ID.',
+          );
+          return;
+        }
+
+        // Navigate to EmailPromptScreen instead of signing out
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchCropScreen(),
+          ),
         );
         return;
       }
-
-      CustomSnackBar().ShowSnackBar(
-        context: context,
-        text: result == "Successfully" ? 'Signed up with Facebook successfully!' : result,
-      );
 
       if (result == "Successfully") {
         final String? userId = AuthService().getCurrentUserId();
@@ -132,22 +137,35 @@ class _LoginScreenState extends State<LoginScreen> {
         final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
         final userData = userDoc.data();
         if (userData != null && userData['phoneNumber'] == null) {
-          // Navigate to phone number prompt screen
+          CustomSnackBar().ShowSnackBar(
+            context: context,
+            text: 'Please add your phone number to continue.',
+          );
+          // TODO: Navigate to a PhoneNumberPromptScreen (to be created)
+          // For now, navigate to SearchCropScreen
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => SearchCropScreen(userId: userId),
+              builder: (context) => SearchCropScreen(),
             ),
           );
         } else {
-          // Navigate directly to SearchCropScreen
+          CustomSnackBar().ShowSnackBar(
+            context: context,
+            text: 'Signed up with Facebook successfully!',
+          );
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => SearchCropScreen(userId: userId),
+              builder: (context) => SearchCropScreen(),
             ),
           );
         }
+      } else {
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: result,
+        );
       }
     } catch (e) {
       setState(() {
@@ -288,7 +306,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => SignUpScreen(
-                            userId: widget.userId,
                           ),
                         ),
                       );

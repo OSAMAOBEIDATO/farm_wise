@@ -13,9 +13,7 @@ class CropEvent {
 }
 
 class CropCalendarScreen extends StatelessWidget {
-  static const String id = "CropCalendarScreen";
-  final String userId; // Kept for consistency, but not used
-  CropCalendarScreen({required this.userId,super.key});
+  CropCalendarScreen({super.key});
 
   // Hardcoded events mapped to dates
   final Map<DateTime, List<CropEvent>> _events = {

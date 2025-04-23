@@ -1,103 +1,300 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farm_wise/service/Authentication.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:farm_wise/Screen/LoginScreen.dart';
+import 'package:farm_wise/Screen/SearchCropScreen.dart';
+import 'package:farm_wise/components/SnakBar.dart';
+import 'package:farm_wise/comman/consta.dart';
+import 'package:farm_wise/Models/UserModel.dart';
 
-class ProfileScreen extends StatelessWidget {
-  static const String id = "ProfileScreen";
-  final String userId;
-  const ProfileScreen({super.key,required this.userId});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  UserModel? _user;
+  bool _isLoading = true;
+  String? _fetchError;
+  String? _userId;
+
+  final AuthService _authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    setState(() {
+      _isLoading = true;
+      _fetchError = null;
+    });
+
+    try {
+      // Fetch userId directly from FirebaseAuth
+      _userId = FirebaseAuth.instance.currentUser?.uid;
+      print('ProfileScreen: Fetched userId from FirebaseAuth = $_userId');
+      if (_userId == null) {
+        throw Exception('No user is currently authenticated');
+      }
+
+      // Fetch user data from Firestore
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_userId)
+          .get();
+
+      if (snapshot.exists) {
+        _user = UserModel.fromMap(_userId!, snapshot.data() as Map<String, dynamic>);
+        print('ProfileScreen: Fetched user data - email: ${_user!.email}, name: ${_user!.firstName} ${_user!.lastName}');
+      } else {
+        print('ProfileScreen: User document not found, creating new document');
+        // Create a new user document if it doesn't exist
+        User? firebaseUser = FirebaseAuth.instance.currentUser;
+        if (firebaseUser == null) {
+          throw Exception('Cannot create user document: No authenticated user');
+        }
+
+        // Extract name and email from Firebase Authentication
+        String firstName = '';
+        String lastName = '';
+        String email = firebaseUser.email ?? '';
+        if (firebaseUser.displayName != null) {
+          final nameParts = firebaseUser.displayName!.split(' ');
+          firstName = nameParts[0];
+          lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+        }
+
+        // Create the user document
+        await FirebaseFirestore.instance.collection('users').doc(_userId).set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': email,
+          'phoneNumber': null, // Will be updated later if needed
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Fetch the newly created document
+        snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_userId)
+            .get();
+
+        if (snapshot.exists) {
+          _user = UserModel.fromMap(_userId!, snapshot.data() as Map<String, dynamic>);
+          print('ProfileScreen: Created and fetched user data - email: ${_user!.email}, name: ${_user!.firstName} ${_user!.lastName}');
+        } else {
+          throw Exception('Failed to create user document');
+        }
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _fetchError = e.toString();
+      });
+      print('ProfileScreen: Error fetching user data: $e');
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: 'Error fetching user data: $e',
+      );
+    }
+  }
+
+  Future<void> _logout() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      String result = await _authService.signOut();
+      if (result == "Successfully") {
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: 'Logged out successfully!',
+        );
+        // Navigate to LoginScreen and clear navigation stack
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) =>  LoginScreen()),
+              (route) => false,
+        );
+      } else {
+        throw Exception(result);
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: 'Error logging out: $e',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.grey[50],
-        elevation: 0,
-        toolbarHeight: 0, // hides appbar space
+      body: RefreshIndicator(
+        onRefresh: _fetchUserData,
+        color: Colors.green,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator(color: Colors.green))
+            : _buildContent(),
       ),
-      body: SingleChildScrollView(
+    );
+  }
+
+  Widget _buildContent() {
+    if (_fetchError != null) {
+      return Center(
+        child: Text(
+          'Error: $_fetchError',
+          style: const TextStyle(color: Colors.red, fontSize: 16),
+        ),
+      );
+    }
+
+    if (_user == null) {
+      return const Center(
+        child: Text(
+          'No user data available',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
-            // Avatar Circle
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.green[900],
-              child: const Text(
-                'O',
-                style: TextStyle(fontSize: 40, color: Colors.white),
+            // User Info Section
+            Center(
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.green[100],
+                    child: Text(
+                      _user!.firstName.isNotEmpty ? _user!.firstName[0].toUpperCase() : 'U',
+                      style: const TextStyle(fontSize: 40, color: Colors.green),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '${_user!.firstName} ${_user!.lastName}',
+                    style: KTextStyle.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _user!.email,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _user!.phone ?? 'No phone number',
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            // Name
+            const SizedBox(height: 32),
+            // Account Settings Section
             const Text(
-              'Ibraheem Jardat',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              'Account Settings',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            // Email Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.email, color: Colors.green[900]),
-                const SizedBox(width: 6),
-                const Text('ibraheem.b@gmail.com'),
-              ],
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.local_florist, color: Colors.green),
+              title: const Text('Crop Options'),
+              onTap: () {
+                if (_userId != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SearchCropScreen(),
+                    ),
+                  );
+                } else {
+                  CustomSnackBar().ShowSnackBar(
+                    context: context,
+                    text: 'Error: User ID not available',
+                  );
+                }
+              },
             ),
-            const SizedBox(height: 30),
+            ListTile(
+              leading: const Icon(Icons.notifications, color: Colors.green),
+              title: const Text('Notifications'),
+              onTap: () {
+                CustomSnackBar().ShowSnackBar(
+                  context: context,
+                  text: 'Notifications feature coming soon!',
+                );
+                // TODO: Implement notifications screen
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.security, color: Colors.green),
+              title: const Text('Security'),
+              onTap: () {
+                CustomSnackBar().ShowSnackBar(
+                  context: context,
+                  text: 'Security settings coming soon!',
+                );
+                // TODO: Implement security settings
+              },
+            ),
 
-            // Section: Account Settings
-            sectionTitle('Account settings'),
-            customListTile('Crop options', Icons.chevron_right, () {
-              // TODO: Handle navigation
-            }),
-            customListTile('Notification management', Icons.chevron_right, () {
-              // TODO: Handle navigation
-            }),
-            customListTile('Account security', Icons.chevron_right, () {
-              // TODO: Handle navigation
-            }),
-
-            const SizedBox(height: 30),
-
-            // Section: Help and Support
-            sectionTitle('Help and Support'),
-            customListTile('About FarmWise', Icons.chevron_right, () {
-              // TODO: Handle navigation
-            }),
-            customListTile('Share the FarmWise app', Icons.chevron_right, () {
-              // TODO: Handle navigation
-            }),
+            const SizedBox(height: 24),
+            // Help and Support Section
+            const Text(
+              'Help and Support',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.share, color: Colors.green),
+              title: const Text('Share App'),
+              onTap: () {
+                CustomSnackBar().ShowSnackBar(
+                  context: context,
+                  text: 'App sharing feature coming soon!',
+                );
+                // TODO: Implement app sharing
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.help, color: Colors.green),
+              title: const Text('Help & Support'),
+              onTap: () {
+                CustomSnackBar().ShowSnackBar(
+                  context: context,
+                  text: 'Help & Support feature coming soon!',
+                );
+                // TODO: Implement help & support
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Logout'),
+              onTap: _logout,
+            ),
           ],
         ),
       ),
-
-      // Bottom Nav Bar
-
-    );
-  }
-
-  // Helper: Section Title
-  Widget sectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          title,
-          style:
-          const TextStyle(
-              fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w500),
-        ),
-      ),
-    );
-  }
-
-  // Helper: Custom List Tile
-  Widget customListTile(String title, IconData icon, VoidCallback onTap) {
-    return ListTile(
-      title: Text(title),
-      trailing: Icon(icon, color: Colors.black),
-      onTap: onTap,
     );
   }
 }

@@ -1,16 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Screen/MainScreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/comman/consta.dart';
-import 'package:farm_wise/Screen/HomeScreen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:farm_wise/Screen/LoginScreen.dart';
 
 class SearchCropScreen extends StatefulWidget {
-  final String userId;
-
-  const SearchCropScreen({super.key, required this.userId});
+  const SearchCropScreen({super.key});
 
   @override
   State<SearchCropScreen> createState() => _SearchCropScreenState();
@@ -27,6 +25,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
   bool isLoading = false;
   bool isFetchingCrops = true;
   String? fetchError;
+  String? _userId;
 
   @override
   void initState() {
@@ -39,7 +38,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
   void dispose() {
     _searchController.dispose();
     _plantDateControllers.forEach(
-      (key, controller) => controller.dispose(),
+          (key, controller) => controller.dispose(),
     );
     super.dispose();
   }
@@ -51,8 +50,15 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
     });
 
     try {
+      // Fetch userId directly from FirebaseAuth
+      _userId = FirebaseAuth.instance.currentUser?.uid;
+      print('SearchCropScreen: Fetched userId from FirebaseAuth = $_userId');
+      if (_userId == null) {
+        throw Exception('No user is currently authenticated');
+      }
+
       QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('crops').get();
+      await FirebaseFirestore.instance.collection('crops').get();
       _availableCrops = snapshot.docs.map((doc) {
         final crop = doc.data() as Map<String, dynamic>;
         crop['id'] = doc.id;
@@ -69,6 +75,16 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
         isFetchingCrops = false;
         fetchError = e.toString();
       });
+      if (e.toString().contains('No user is currently authenticated')) {
+        // Redirect to LoginScreen if user is not authenticated
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+          );
+        });
+      }
     }
   }
 
@@ -87,11 +103,12 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      barrierColor: Colors.green,
     );
 
     if (picked != null) {
       _plantDateControllers[cropId]?.text =
-          "${picked.day}/${picked.month}/${picked.year}";
+      "${picked.day}/${picked.month}/${picked.year}";
     }
   }
 
@@ -104,9 +121,22 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
       return;
     }
 
-    setState(
-      () => isLoading = true,
-    );
+    if (_userId == null) {
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: "Error: User not authenticated",
+      );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+            (route) => false,
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
 
     try {
       for (final cropId in _selectedCropIds) {
@@ -115,11 +145,11 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
 
         final docRef = await FirebaseFirestore.instance
             .collection("users")
-            .doc(widget.userId)
+            .doc(_userId)
             .collection("crops")
             .add({
           'CropID': '',
-          'UserID': widget.userId,
+          'UserID': _userId,
           'CropName': crop['name'],
           'PlantDate': date,
           'HarvestDate': '',
@@ -137,7 +167,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => MainScreen(userId: widget.userId),
+          builder: (_) => const MainScreen(),
         ),
       );
     } catch (e) {
@@ -153,7 +183,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("Search Crops", style: KTextStyle)),
       body: isFetchingCrops
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Colors.green))
           : _buildContent(),
     );
   }
@@ -166,9 +196,15 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
+              iconColor: Colors.black,
               hintText: "Search crops...",
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              hintStyle: const TextStyle(
+                color: Colors.grey,
+                fontSize: 20,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               prefixIcon: const Icon(Icons.search),
             ),
           ),
@@ -176,36 +212,35 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
           _filteredCrops.isEmpty
               ? const Text("Search to view crops")
               : Expanded(
-                  child: ListView.builder(
-                    itemCount: _filteredCrops.length,
-                    itemBuilder: (context, index) {
-                      final crop = _filteredCrops[index];
-                      final selected = _selectedCropIds.contains(crop['id']);
-
-                      return Card(
-                        elevation: 2,
-                        color: selected ? Colors.green[50] : null,
-                        child: ListTile(
-                          title: Text(crop['name']),
-                          subtitle: Text("Type: ${crop['type']}"),
-                          trailing: selected
-                              ? const Icon(Icons.check_circle,
-                                  color: Colors.green)
-                              : null,
-                          onTap: () {
-                            setState(() {
-                              if (selected) {
-                                _selectedCropIds.remove(crop['id']);
-                              } else {
-                                _selectedCropIds.add(crop['id']);
-                              }
-                            });
-                          },
-                        ),
-                      );
+            child: ListView.builder(
+              itemCount: _filteredCrops.length,
+              itemBuilder: (context, index) {
+                final crop = _filteredCrops[index];
+                final selected = _selectedCropIds.contains(crop['id']);
+                return Card(
+                  elevation: 2,
+                  color: selected ? Colors.green[50] : null,
+                  child: ListTile(
+                    title: Text(crop['name']),
+                    subtitle: Text("Type: ${crop['type']}"),
+                    trailing: selected
+                        ? const Icon(Icons.check_circle,
+                        color: Colors.green)
+                        : null,
+                    onTap: () {
+                      setState(() {
+                        if (selected) {
+                          _selectedCropIds.remove(crop['id']);
+                        } else {
+                          _selectedCropIds.add(crop['id']);
+                        }
+                      });
                     },
                   ),
-                ),
+                );
+              },
+            ),
+          ),
           if (_selectedCropIds.isNotEmpty) ...[
             const SizedBox(height: 16),
             Text("Set Planting Dates:", style: KTextStyle),
@@ -214,21 +249,29 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
               children: _selectedCropIds.map((cropId) {
                 final controller = _plantDateControllers[cropId]!;
                 final crop =
-                    _availableCrops.firstWhere((c) => c['id'] == cropId);
+                _availableCrops.firstWhere((c) => c['id'] == cropId);
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     children: [
-                      Expanded(child: Text(crop['name'])),
+                      Expanded(
+                        child: Text(
+                          crop['name'],
+                          style: KTextStyle,
+                        ),
+                      ),
                       Expanded(
                         child: TextField(
                           controller: controller,
+                          style: const TextStyle(color: Colors.black),
                           readOnly: true,
                           decoration: const InputDecoration(
                             hintText: "Select Date",
                             border: OutlineInputBorder(),
                             suffixIcon: Icon(Icons.calendar_today),
+                            iconColor: Colors.green,
+                            hintStyle: TextStyle(color: Colors.black54),
                           ),
                           onTap: () => _selectDate(cropId),
                         ),
@@ -242,7 +285,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             ElevatedButton(
               onPressed: isLoading ? null : _saveSelectedCrops,
               child: isLoading
-                  ? const CircularProgressIndicator()
+                  ? const CircularProgressIndicator(color: Colors.green)
                   : Text("Save Selected Crops", style: KTextStyle),
             ),
           ],

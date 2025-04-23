@@ -20,7 +20,7 @@ class _SpalshScreenState extends State<SpalshScreen> {
           () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>LoginScreen(userId: widget.userId,)),
+          MaterialPageRoute(builder: (context) =>LoginScreen()),
         );
       },
     );

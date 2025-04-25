@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:farm_wise/Screen/LoginScreen.dart';
 import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:farm_wise/components/SnakBar.dart';
-import 'package:farm_wise/comman/consta.dart';
+import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/Models/UserModel.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -187,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     radius: 50,
                     backgroundColor: Colors.green[100],
                     child: Text(
-                      _user!.firstName.isNotEmpty ? _user!.firstName[0].toUpperCase() : 'U',
+                      _user!.firstName.isNotEmpty ? _user!.firstName[0].toUpperCase() : 'O',
                       style: const TextStyle(fontSize: 40, color: Colors.green),
                     ),
                   ),

@@ -1,8 +1,8 @@
-import 'package:farm_wise/Models/CropUser.dart';
+import 'package:farm_wise/models/CropData.dart';
 import 'package:flutter/material.dart';
 
 class CardCropTile extends StatelessWidget {
-  final Crop crop;
+  final CropData crop;
   final Color iconColor;
 
   const CardCropTile({
@@ -11,20 +11,9 @@ class CardCropTile extends StatelessWidget {
     required this.iconColor,
   });
 
-  String _calculateHarvestDate() {
-    try {
-      // Parse PlantDate (format: "DD/MM/YYYY")
-      List<String> dateParts = crop.plantDate.split('/');
-      DateTime plantDateTime = DateTime(
-        int.parse(dateParts[2]), // Year
-        int.parse(dateParts[1]), // Month
-        int.parse(dateParts[0]), // Day
-      );
-      DateTime harvestDateTime = plantDateTime.add(Duration(days: crop.harvestDays));
-      return '${harvestDateTime.day}/${harvestDateTime.month}/${harvestDateTime.year}';
-    } catch (e) {
-      return 'Unknown';
-    }
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Unknown';
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   @override
@@ -49,17 +38,17 @@ class CardCropTile extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              'Planted: ${crop.plantDate}',
+              'Planted: ${_formatDate(crop.plantDate)}',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
             Text(
-              'Harvest: ${_calculateHarvestDate()}',
+              'Harvest: ${_formatDate(crop.harvestDate)}',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
             Text(
-              crop.plantType,
+              crop.soilType,
               style: const TextStyle(fontSize: 12, color: Colors.grey),
               textAlign: TextAlign.center,
             ),

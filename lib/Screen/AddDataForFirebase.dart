@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:farm_wise/components/SnakBar.dart';
-import 'package:farm_wise/comman/consta.dart';
+import 'package:farm_wise/Common/Constant.dart';
 
 class PopulateCropsScreen extends StatelessWidget {
   const PopulateCropsScreen({super.key});

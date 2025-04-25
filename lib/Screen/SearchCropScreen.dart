@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Screen/MainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:farm_wise/components/SnakBar.dart';
-import 'package:farm_wise/comman/consta.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:farm_wise/Common/Constant.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:farm_wise/Screen/LoginScreen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SearchCropScreen extends StatefulWidget {
   const SearchCropScreen({super.key});
@@ -17,10 +17,10 @@ class SearchCropScreen extends StatefulWidget {
 class _SearchCropScreenState extends State<SearchCropScreen> {
   final TextEditingController _searchController = TextEditingController();
   final Map<String, TextEditingController> _plantDateControllers = {};
-
   List<Map<String, dynamic>> _availableCrops = [];
   List<Map<String, dynamic>> _filteredCrops = [];
-  Set<String> _selectedCropIds = {}; // To track selected crops
+  final Set<String> _selectedCropIds = {};
+  List<String> _existingCropNames = [];
 
   bool isLoading = false;
   bool isFetchingCrops = true;
@@ -37,9 +37,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    _plantDateControllers.forEach(
-          (key, controller) => controller.dispose(),
-    );
+    _plantDateControllers.forEach((key, controller) => controller.dispose());
     super.dispose();
   }
 
@@ -50,12 +48,20 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
     });
 
     try {
-      // Fetch userId directly from FirebaseAuth
       _userId = FirebaseAuth.instance.currentUser?.uid;
-      print('SearchCropScreen: Fetched userId from FirebaseAuth = $_userId');
       if (_userId == null) {
         throw Exception('No user is currently authenticated');
       }
+      QuerySnapshot userCropsSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_userId)
+          .collection('crops')
+          .get();
+      _existingCropNames = userCropsSnapshot.docs
+          .map((doc) =>
+          ((doc.data() as Map<String, dynamic>)['CropName'] as String)
+              .toLowerCase())
+          .toList();
 
       QuerySnapshot snapshot =
       await FirebaseFirestore.instance.collection('crops').get();
@@ -76,7 +82,6 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
         fetchError = e.toString();
       });
       if (e.toString().contains('No user is currently authenticated')) {
-        // Redirect to LoginScreen if user is not authenticated
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.pushAndRemoveUntil(
             context,
@@ -121,6 +126,22 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
       return;
     }
 
+    List<String> cropsWithoutDates = [];
+    for (String cropId in _selectedCropIds) {
+      final date = _plantDateControllers[cropId]?.text ?? "";
+      if (date.isEmpty) {
+        final crop = _availableCrops.firstWhere((c) => c['id'] == cropId);
+        cropsWithoutDates.add(crop['name']);
+      }
+    }
+    if (cropsWithoutDates.isNotEmpty) {
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: "Please set planting dates for: ${cropsWithoutDates.join(', ')}",
+      );
+      return;
+    }
+
     if (_userId == null) {
       CustomSnackBar().ShowSnackBar(
         context: context,
@@ -139,40 +160,96 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
     });
 
     try {
-      for (final cropId in _selectedCropIds) {
-        final crop = _availableCrops.firstWhere((c) => c['id'] == cropId);
-        final date = _plantDateControllers[cropId]?.text ?? "";
+      List<String> successfullyAddedCrops = [];
+      List<String> failedCrops = [];
 
-        final docRef = await FirebaseFirestore.instance
-            .collection("users")
-            .doc(_userId)
-            .collection("crops")
-            .add({
-          'CropID': '',
-          'UserID': _userId,
-          'CropName': crop['name'],
-          'PlantDate': date,
-          'HarvestDate': '',
-          'PlantType': crop['type'],
-          'fertilizers': crop['fertilizers'],
-          'pesticides': '',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+      for (String cropId in _selectedCropIds) {
+        try {
+          final crop = _availableCrops.firstWhere((c) => c['id'] == cropId);
+          final date = _plantDateControllers[cropId]?.text ?? "";
 
-        await docRef.update({'CropID': docRef.id});
+          DateTime? plantDateTime;
+          DateTime? harvestDateTime;
+          if (date.isNotEmpty) {
+            List<String> dateParts = date.split('/');
+            plantDateTime = DateTime(
+              int.parse(dateParts[2]),
+              int.parse(dateParts[1]),
+              int.parse(dateParts[0]),
+            );
+            // Calculate harvestDate by adding harvestDateNumber to plantDate
+            int harvestDays = crop['harvestDateNumber'] ?? 0;
+            harvestDateTime =
+                plantDateTime.add(Duration(days: harvestDays));
+          }
+
+          if (_existingCropNames.contains(crop['name'].toLowerCase())) {
+            failedCrops.add("${crop['name']} (already in your crops)");
+            continue;
+          }
+
+          List<String> pesticidesList;
+          final pesticidesRaw = crop['pesticides'];
+          if (pesticidesRaw == null || pesticidesRaw == '') {
+            pesticidesList = [];
+          } else if (pesticidesRaw is String) {
+            pesticidesList = pesticidesRaw.split(',').map((e) => e.trim()).toList();
+          } else if (pesticidesRaw is Iterable) {
+            pesticidesList = pesticidesRaw.map((e) => e.toString()).toList();
+          } else {
+            pesticidesList = [pesticidesRaw.toString()];
+          }
+
+          final docRef = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(_userId)
+              .collection("crops")
+              .add({
+            'CropID': '',
+            'UserID': _userId,
+            'CropName': crop['name'],
+            'PlantDate': plantDateTime != null ? Timestamp.fromDate(plantDateTime) : null,
+            'HarvestDate': harvestDateTime != null ? Timestamp.fromDate(harvestDateTime) : null,
+            'PlantType': crop['type'],
+            'fertilizers': crop['fertilizers'] ?? [],
+            'pesticides': pesticidesList,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          await docRef.update({'CropID': docRef.id});
+          successfullyAddedCrops.add(crop['name']);
+          _existingCropNames.add(crop['name'].toLowerCase());
+        } catch (e) {
+          final crop = _availableCrops.firstWhere((c) => c['id'] == cropId);
+          failedCrops.add("${crop['name']} (error: $e)");
+        }
       }
 
-      CustomSnackBar()
-          .ShowSnackBar(context: context, text: "Crops added successfully!");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const MainScreen(),
-        ),
+      String message = '';
+      if (successfullyAddedCrops.isNotEmpty) {
+        message += "${successfullyAddedCrops.length} crop(s) added successfully: ${successfullyAddedCrops.join(', ')}.";
+      }
+      if (failedCrops.isNotEmpty) {
+        message += "\nFailed to add ${failedCrops.length} crop(s): ${failedCrops.join(', ')}.";
+      }
+
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: message,
       );
+
+      if (successfullyAddedCrops.isNotEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const MainScreen(),
+          ),
+        );
+      }
     } catch (e) {
-      CustomSnackBar()
-          .ShowSnackBar(context: context, text: "Error saving crops: $e");
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: "Unexpected error: $e",
+      );
     } finally {
       setState(() => isLoading = false);
     }
@@ -181,9 +258,17 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Search Crops", style: KTextStyle)),
+      appBar: AppBar(
+        title: Text(
+          "Search Crops",
+          style: GoogleFonts.adamina(fontSize: 20, color: Colors.black),
+        ),
+        backgroundColor: Colors.green,
+      ),
       body: isFetchingCrops
-          ? const Center(child: CircularProgressIndicator(color: Colors.green))
+          ? const Center(
+        child: CircularProgressIndicator(color: Colors.green),
+      )
           : _buildContent(),
     );
   }
@@ -197,6 +282,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             controller: _searchController,
             decoration: InputDecoration(
               iconColor: Colors.black,
+              focusColor: Colors.green,
               hintText: "Search crops...",
               hintStyle: const TextStyle(
                 color: Colors.grey,
@@ -217,17 +303,30 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
               itemBuilder: (context, index) {
                 final crop = _filteredCrops[index];
                 final selected = _selectedCropIds.contains(crop['id']);
+                final isAlreadyAdded =
+                _existingCropNames.contains(crop['name'].toLowerCase());
+
                 return Card(
                   elevation: 2,
-                  color: selected ? Colors.green[50] : null,
+                  color: selected
+                      ? Colors.green[50]
+                      : (isAlreadyAdded ? Colors.grey[200] : null),
                   child: ListTile(
                     title: Text(crop['name']),
                     subtitle: Text("Type: ${crop['type']}"),
                     trailing: selected
-                        ? const Icon(Icons.check_circle,
-                        color: Colors.green)
-                        : null,
-                    onTap: () {
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : (isAlreadyAdded
+                        ? const Icon(Icons.lock, color: Colors.grey)
+                        : null),
+                    onTap: isAlreadyAdded
+                        ? () {
+                      CustomSnackBar().ShowSnackBar(
+                        context: context,
+                        text: "${crop['name']} is already in your crops!",
+                      );
+                    }
+                        : () {
                       setState(() {
                         if (selected) {
                           _selectedCropIds.remove(crop['id']);
@@ -286,7 +385,8 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
               onPressed: isLoading ? null : _saveSelectedCrops,
               child: isLoading
                   ? const CircularProgressIndicator(color: Colors.green)
-                  : Text("Save Selected Crops", style: KTextStyle),
+                  : Text("Save Selected Crops (${_selectedCropIds.length})",
+                  style: KTextStyle),
             ),
           ],
         ],

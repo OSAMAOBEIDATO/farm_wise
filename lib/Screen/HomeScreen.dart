@@ -1,4 +1,4 @@
-import 'package:farm_wise/Models/CropUser.dart';
+import 'package:farm_wise/Models/CropData.dart';
 import 'package:farm_wise/Screen/CropDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,10 +14,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Crop> _userCrops = [];
+  List<CropData> _userCrops = [];
   bool _isLoadingCrops = true;
   String? _fetchError;
-  String? _userId;
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
@@ -32,13 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      _userId = FirebaseAuth.instance.currentUser?.uid;
-      if (_userId == null)
+      if (userId == null) {
         throw Exception('No user is currently authenticated');
+      }
 
       QuerySnapshot cropSnapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(_userId)
+          .doc(userId)
           .collection('crops')
           .get();
 
@@ -54,17 +54,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (cropDetailSnapshot.docs.isNotEmpty) {
           var cropDetails =
-              cropDetailSnapshot.docs.first.data() as Map<String, dynamic>;
-          cropData['harvestDays'] = cropDetails['harvestDate'] ?? 0;
+          cropDetailSnapshot.docs.first.data() as Map<String, dynamic>;
+          cropData['harvestDays'] = cropDetails['harvestDateNumber'] ?? 0;
+          // Add other fields from cropDetails if needed
+          cropData['bestPlantingSeason'] = cropDetails['bestPlantingSeason'] ?? '';
+          cropData['fertilizers'] = cropDetails['fertilizers'] ?? '';
+          cropData['growingTime'] = cropDetails['growingTime'] ?? 0;
+          cropData['irrigationGuide'] = cropDetails['irrigationGuide'] ?? '';
+          cropData['soilType'] = cropDetails['soilType'] ?? '';
+          cropData['sunlight'] = cropDetails['sunlight'] ?? '';
+          cropData['type'] = cropDetails['type'] ?? '';
+          cropData['waterRequirement'] = cropDetails['waterRequirement'] ?? '';
         } else {
           cropData['harvestDays'] = 0;
+          cropData['bestPlantingSeason'] = '';
+          cropData['fertilizers'] = '';
+          cropData['growingTime'] = 0;
+          cropData['irrigationGuide'] = '';
+          cropData['soilType'] = '';
+          cropData['sunlight'] = '';
+          cropData['type'] = '';
+          cropData['waterRequirement'] = '';
         }
 
         userCrops.add(cropData);
       }
 
       setState(() {
-        _userCrops = userCrops.map((crop) => Crop.fromMap(crop)).toList();
+        _userCrops = userCrops.map((crop) => CropData.fromMap(crop)).toList();
         _isLoadingCrops = false;
       });
     } catch (e) {
@@ -81,12 +98,19 @@ class _HomeScreenState extends State<HomeScreen> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (_) => const LoginScreen()),
-            (route) => false,
+            MaterialPageRoute(
+              builder: (_) => const LoginScreen(),
+            ),
+                (route) => false,
           );
         });
       }
     }
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Not set';
+    return "${date.day}/${date.month}/${date.year}";
   }
 
   @override
@@ -145,62 +169,66 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             if (_isLoadingCrops)
-              const Center(
-                  child: CircularProgressIndicator(color: Colors.green))
+              const Center(child: CircularProgressIndicator(color: Colors.green))
             else if (_fetchError != null)
               Center(
                   child: Text('Error: $_fetchError',
                       style: const TextStyle(color: Colors.red, fontSize: 16)))
             else if (_userCrops.isEmpty)
-              const Center(child: Text('No crops found'))
-            else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _userCrops.length,
-                itemBuilder: (context, index) {
-                  final crop = _userCrops[index];
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // space between text and icon
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                crop.cropName,
-                                style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                              Text("Type: ${crop.plantType}"),
-                              Text("Planted on: ${crop.plantDate}"),
-                            ],
+                const Center(child: Text('No crops found'))
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _userCrops.length,
+                  itemBuilder: (context, index) {
+                    final crop = _userCrops[index];
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  crop.name,
+                                  style: const TextStyle(
+                                      fontSize: 20, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                Text("Type: ${crop.type}"),
+                                Text("Planted on: ${_formatDate(crop.plantDate)}"),
+                                Text("Harvest on: ${_formatDate(crop.harvestDate)}"),
+                              ],
+                            ),
                           ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const CropDetails()));
-                          },
-                          child: const Icon(Icons.menu, size: 30),
-                        )
-                      ],
-                    ),
-                  );
-                },
-              ),
+                          InkWell(
+                            onTap: () {
+                               Navigator.push(
+                                 context,
+                                 MaterialPageRoute(
+                                  builder: (context) => CropDetails(
+                                     userId: userId!,
+                                    crop: crop,
+                                  ),
+                                ),
+                               );
+                            },
+                            child: const Icon(Icons.menu, size: 30),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
           ],
         ),
       ),

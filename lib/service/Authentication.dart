@@ -82,8 +82,7 @@ class AuthService {
           'email': email,
           'createdAt': FieldValue.serverTimestamp(),
         });
-
-        res = "Successfully";
+        return res = "Successfully";
       }
     } on FirebaseAuthException catch (err) {
       switch (err.code) {
@@ -107,12 +106,10 @@ class AuthService {
     required String password,
   }) async {
     try {
-      print('Starting sign-in process for email: $email'); // Debug log
       await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print('Sign-in completed successfully'); // Debug log
       return "Successfully";
     } on FirebaseAuthException catch (e) {
       print('Firebase Auth error during sign-in: ${e.code} - ${e.message}'); // Debug log
@@ -133,33 +130,29 @@ class AuthService {
           return 'An error occurred during sign-in. Please try again.';
       }
     } catch (e) {
-      print('Unexpected error during sign-in: $e'); // Debug log
       return 'An unexpected error occurred: $e';
     }
   }
 
   Future<String> signOut() async {
     try {
-      print('Starting sign-out process'); // Debug log
       await _auth.signOut();
-      print('Sign-out completed successfully'); // Debug log
       return "Successfully";
     } catch (e) {
-      print('Error during sign-out: $e'); // Debug log
       return 'Error signing out: $e';
     }
   }
 
   String? getCurrentUserId() {
     final String? userId = _auth.currentUser?.uid;
-    print('Current user ID: $userId'); // Debug log
     return userId;
   }
 
   Future<UserModel?> getUserData() async {
     final String? uid = getCurrentUserId();
-    if (uid == null) return null;
-
+    if (uid == null) {
+      return null;
+    }
     try {
       final doc = await _firestore.collection('users').doc(uid).get();
       if (doc.exists) {
@@ -167,98 +160,65 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print('Error fetching user data: $e');
       return null;
     }
   }
 
   Future<String> signUpWithFacebook() async {
-    try {
-      print('Starting Facebook sign-up process'); // Debug log
+    String firstName = '';
+    String lastName = '';
 
-      // Log in with Facebook
+    try {
       final LoginResult result = await FacebookAuth.instance.login(
         permissions: ['public_profile'], // Removed 'email' to avoid scope error
       );
 
-      // Removed declinedPermissions since it doesn't exist
-      print('Facebook login result: ${result.status}, ${result.message}');
-
       if (result.status != LoginStatus.success) {
-        print('Facebook login failed: ${result.status} - ${result.message}');
         if (result.status == LoginStatus.cancelled) {
           return 'Facebook sign-up cancelled by user.';
         }
         return 'Facebook sign-up failed: ${result.message}';
       }
 
-      // Get the access token
       final AccessToken? accessToken = result.accessToken;
       if (accessToken == null) {
-        print('No access token received from Facebook');
         return 'Failed to retrieve Facebook access token.';
       }
-      print('Access token received: ${accessToken.tokenString}');
-
-      // Create a Firebase credential with the access token
-      print('Creating Firebase credential with Facebook access token');
       final OAuthCredential facebookCredential = FacebookAuthProvider.credential(accessToken.tokenString);
 
-      // Sign in to Firebase with the credential
-      print('Signing in to Firebase with Facebook credential');
       final UserCredential userCredential = await _auth.signInWithCredential(facebookCredential);
       final User? user = userCredential.user;
 
       if (user == null) {
-        print('No user returned after Firebase sign-in');
         return 'Failed to sign in to Firebase with Facebook.';
       }
-      print('Firebase sign-in successful, user UID: ${user.uid}');
 
-      // Check if the user already exists in Firestore
-      print('Checking if user exists in Firestore: ${user.uid}');
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
       if (!userDoc.exists) {
-        print('User does not exist in Firestore, creating new user document');
-        // If the user doesn't exist, create a new user document
         String? email = user.email;
 
-        // If email is not available via Firebase, try fetching it directly from Facebook
         if (email == null) {
-          print('Email not available via Firebase, fetching from Facebook');
           final userData = await FacebookAuth.instance.getUserData(fields: "email,name");
-          print('User data from Facebook: $userData');
           email = userData['email'];
         }
 
         if (email == null) {
-          print('No email provided by Facebook');
-          // Instead of signing out, return a special message to prompt for email
           return 'PromptForEmail:${user.uid}:${user.displayName ?? ''}';
         }
 
-        // Validate email domain (your app only allows Gmail)
-        print('Validating email domain: $email');
         final emailError = validateEmailDomain(email);
         if (emailError != null) {
-          print('Email validation failed: $emailError');
-          // Sign out the user since they can't proceed with a non-Gmail account
           await _auth.signOut();
           return emailError;
         }
 
-        // Extract first and last name from displayName (if available)
-        String firstName = '';
-        String lastName = '';
+
         if (user.displayName != null) {
           final nameParts = user.displayName!.split(' ');
           firstName = nameParts[0];
           lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
         }
-        print('Extracted user info - First Name: $firstName, Last Name: $lastName');
 
-        // Add user to Firestore without a phone number (will be set later)
-        print('Adding user to Firestore: ${user.uid}');
         await _firestore.collection("users").doc(user.uid).set({
           'firstName': firstName,
           'lastName': lastName,
@@ -266,15 +226,12 @@ class AuthService {
           'email': email,
           'createdAt': FieldValue.serverTimestamp(),
         });
-        print('User added to Firestore successfully');
       } else {
         print('User already exists in Firestore');
       }
 
-      print('Facebook sign-up completed successfully for user: ${user.uid}');
       return "Successfully";
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth error during Facebook sign-up: ${e.code} - ${e.message}');
       switch (e.code) {
         case 'account-exists-with-different-credential':
           return 'This email is already associated with another account. Please use a different sign-in method.';
@@ -288,7 +245,6 @@ class AuthService {
           return 'An error occurred during Facebook sign-up: ${e.message}';
       }
     } catch (e) {
-      print('Unexpected error during Facebook sign-up: $e');
       return 'An unexpected error occurred: $e';
     }
   }

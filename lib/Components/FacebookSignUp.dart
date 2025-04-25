@@ -1,4 +1,4 @@
-import 'package:farm_wise/comman/consta.dart';
+import 'package:farm_wise/Common/Constant.dart';
 import 'package:flutter/material.dart';
 
 class SignInWithFacebook extends StatelessWidget {

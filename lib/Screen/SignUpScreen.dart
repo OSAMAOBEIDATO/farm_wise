@@ -1,9 +1,8 @@
 import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/LoginScreen.dart';
-import 'package:farm_wise/comman/consta.dart';
+import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/components/ReusableTextField.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
@@ -16,14 +15,12 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  // Controllers for form fields
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // State for loading indicator
   bool isLoading = false;
 
   @override
@@ -50,27 +47,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
         phoneNumber: _phoneNumberController.text,
       );
 
-      print('Sign-up result: $res'); // Debug log to confirm result
-
       setState(() {
         isLoading = false;
       });
 
       if (res == "Successfully") {
-        print('Navigating to HomeScreen'); // Debug log
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SearchCropScreen()),
+          MaterialPageRoute(
+            builder: (context) => const SearchCropScreen(),
+          ),
         );
       } else {
         print('Showing error SnackBar: $res'); // Debug log
-
       }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      print('Sign-up error: $e'); // Log the error for debugging
       CustomSnackBar().ShowSnackBar(
         context: context,
         text: 'An unexpected error occurred: $e',
@@ -78,12 +72,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  //OSamaObeidat@gmail.com
-//OSamaa@789
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -188,7 +179,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
                       );
                     },
                     child: Text(

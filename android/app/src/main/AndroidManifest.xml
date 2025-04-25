@@ -9,8 +9,6 @@
         <meta-data
             android:name="com.facebook.sdk.ClientToken"
             android:value="@string/facebook_client_token"/>
-
-
         <activity
             android:name=".MainActivity"
             android:exported="true"

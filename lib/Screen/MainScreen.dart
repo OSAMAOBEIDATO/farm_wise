@@ -4,6 +4,7 @@ import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/CropCalendarScreen.dart';
 import 'package:farm_wise/Screen/DiseaseScreen.dart';
 import 'package:farm_wise/Screen/ProfileScreen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MainScreen extends StatefulWidget {
 
@@ -37,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FarmWise'),
+        title: Text('FarmWise',style: GoogleFonts.adamina(fontSize: 20,color: Colors.black),),
         backgroundColor: Colors.green,
 
       ),

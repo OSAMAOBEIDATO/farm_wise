@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:farm_wise/Screen/LoginScreen.dart';
 import 'package:farm_wise/components/CardWeatherTile.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -56,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
           var cropDetails =
           cropDetailSnapshot.docs.first.data() as Map<String, dynamic>;
           cropData['harvestDays'] = cropDetails['harvestDateNumber'] ?? 0;
-          // Add other fields from cropDetails if needed
           cropData['bestPlantingSeason'] = cropDetails['bestPlantingSeason'] ?? '';
           cropData['fertilizers'] = cropDetails['fertilizers'] ?? '';
           cropData['growingTime'] = cropDetails['growingTime'] ?? 0;
@@ -165,8 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            const Text('Your Crops',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+             Text('Your Crops',
+                style: GoogleFonts.adamina(fontSize: 18,fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             if (_isLoadingCrops)
               const Center(child: CircularProgressIndicator(color: Colors.green))

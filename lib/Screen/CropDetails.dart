@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:farm_wise/Models/CropData.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 
 class CropDetails extends StatefulWidget {

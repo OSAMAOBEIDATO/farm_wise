@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Models/UserModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -163,7 +166,14 @@ class AuthService {
       return null;
     }
   }
-
+  Future<String> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return "Successfully sent password reset email. Please check your inbox.";
+    } catch (e) {
+      return "Error sending password reset email: $e";
+    }
+  }
   Future<String> signUpWithFacebook() async {
     String firstName = '';
     String lastName = '';
@@ -248,4 +258,6 @@ class AuthService {
       return 'An unexpected error occurred: $e';
     }
   }
+
+
 }

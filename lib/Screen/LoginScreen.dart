@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Common/Constant.dart';
+import 'package:farm_wise/Screen/ForgetPasswordScreen.dart';
 import 'package:farm_wise/Screen/MainScreen.dart';
 import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
@@ -214,7 +215,14 @@ class _LoginScreenState extends State<LoginScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {},//TODO: Add forgot password screen
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },//TODO: Add forgot password screen
                   child: Text(
                     "Forget Password?",
                     style: TextStyle(color: Colors.green[500]),

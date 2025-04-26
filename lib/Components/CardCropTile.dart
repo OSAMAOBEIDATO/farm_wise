@@ -33,7 +33,7 @@ class CardCropTile extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              crop.cropName,
+              crop.name,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),

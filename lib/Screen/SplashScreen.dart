@@ -1,5 +1,8 @@
 import 'package:farm_wise/Screen/LoginScreen.dart';
+import 'package:farm_wise/Screen/MainScreen.dart';
 import 'package:flutter/material.dart';
+
+import 'AddDataForFirebase.dart';
 
 class SpalshScreen extends StatefulWidget {
 
@@ -18,7 +21,7 @@ class _SpalshScreenState extends State<SpalshScreen> {
           () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>LoginScreen()),
+          MaterialPageRoute(builder: (context) =>const LoginScreen()),
         );
       },
     );

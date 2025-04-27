@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Screen/MainScreen.dart';
-import 'package:farm_wise/components/buildActionButton.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:farm_wise/Models/CropData.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/components/SnakBar.dart';
+import 'package:farm_wise/components/buildActionButton.dart';
+import 'package:farm_wise/Common/Constant.dart';
 
 class CropDetails extends StatefulWidget {
   final CropData crop;
@@ -63,9 +64,7 @@ class _CropDetailsState extends State<CropDetails> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const MainScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const MainScreen()),
       );
     } catch (e) {
       setState(() {
@@ -89,14 +88,14 @@ class _CropDetailsState extends State<CropDetails> {
       appBar: AppBar(
         title: Text(
           'FarmWise',
-          style: GoogleFonts.adamina(fontSize: 20, color: Colors.black),
+          style: GoogleFonts.adamina(fontSize: 22, color: Colors.black),
         ),
         backgroundColor: Colors.green,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Row(
@@ -105,7 +104,7 @@ class _CropDetailsState extends State<CropDetails> {
                 Expanded(
                   flex: 2,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(15),
                     child: Image.asset(
                       'assets/Image/splashScreen.png',
                       height: 250,
@@ -124,7 +123,7 @@ class _CropDetailsState extends State<CropDetails> {
                 Expanded(
                   flex: 1,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       buildActionButton(label: 'Time', fontSize: 20),
                       const SizedBox(height: 12),
@@ -149,24 +148,47 @@ class _CropDetailsState extends State<CropDetails> {
               ),
             ),
             const SizedBox(height: 10),
-            Text('Planted: ${_formatDate(widget.crop.plantDate)}'),
-            Text('Harvest: ${widget.crop.irrigationGuide}'),
-            Text('Type: ${widget.crop.soilType}'),
-          ],
-        ),
-      ),
-      bottomSheet: _isDeleting
-          ? const Center(child: CircularProgressIndicator(color: Colors.red))
-          : TextButton(
-        onPressed: _deleteCrop,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.delete, color: Colors.red),
-            const SizedBox(width: 3),
-            Text(
-              'Delete Crop',
-              style: GoogleFonts.adamina(fontSize: 18, color: Colors.red),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                Text(
+                  "Name: ${widget.crop.name}",
+                  style: KTextStyle,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Planted Date: ${_formatDate(widget.crop.plantDate)}",
+                  style: KTextStyle,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Harvest Info: ${widget.crop.irrigationGuide ?? "N/A"}",
+                  style: KTextStyle,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Soil Type: ${widget.crop.soilType ?? "N/A"}",
+                  style: KTextStyle,
+                ),
+              ],
+            ),
+            const Spacer(),
+            SizedBox(
+              height: 55,
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isDeleting ? null : _deleteCrop,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: _isDeleting
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text('Delete Crop', style: KTextStyle.copyWith(color: Colors.white)),
+              ),
             ),
           ],
         ),

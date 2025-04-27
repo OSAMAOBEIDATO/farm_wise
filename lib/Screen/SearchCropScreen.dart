@@ -188,17 +188,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             continue;
           }
 
-          List<String> pesticidesList;
-          final pesticidesRaw = crop['pesticides'];
-          if (pesticidesRaw == null || pesticidesRaw == '') {
-            pesticidesList = [];
-          } else if (pesticidesRaw is String) {
-            pesticidesList = pesticidesRaw.split(',').map((e) => e.trim()).toList();
-          } else if (pesticidesRaw is Iterable) {
-            pesticidesList = pesticidesRaw.map((e) => e.toString()).toList();
-          } else {
-            pesticidesList = [pesticidesRaw.toString()];
-          }
+
 
           final docRef = await FirebaseFirestore.instance
               .collection("users")
@@ -212,7 +202,6 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             'HarvestDate': harvestDateTime != null ? Timestamp.fromDate(harvestDateTime) : null,
             'PlantType': crop['type'],
             'fertilizers': crop['fertilizers'] ?? [],
-            'pesticides': pesticidesList,
             'createdAt': FieldValue.serverTimestamp(),
           });
           await docRef.update({'CropID': docRef.id});
@@ -308,10 +297,12 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
 
                 return Card(
                   elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   color: selected
                       ? Colors.green[50]
                       : (isAlreadyAdded ? Colors.grey[200] : null),
                   child: ListTile(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     title: Text(crop['name']),
                     subtitle: Text("Type: ${crop['type']}"),
                     trailing: selected
@@ -367,8 +358,8 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
                           readOnly: true,
                           decoration: const InputDecoration(
                             hintText: "Select Date",
-                            border: OutlineInputBorder(),
-                            suffixIcon: Icon(Icons.calendar_today),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+                            suffixIcon: Icon(Icons.calendar_today,color:Colors.black,),
                             iconColor: Colors.green,
                             hintStyle: TextStyle(color: Colors.black54),
                           ),

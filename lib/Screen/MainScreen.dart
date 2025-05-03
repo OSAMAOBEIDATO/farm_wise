@@ -22,11 +22,11 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _screens = [
-      HomeScreen(),
-      CropDiseaseDetectionScreen(),
+    _screens = <Widget>[
+       const HomeScreen(),
+      const CropDiseaseDetectionScreen(),
       CropCalendarScreen(),
-      ProfileScreen(),
+      const ProfileScreen(),
     ];
   }
 
@@ -40,7 +40,6 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text('FarmWise',style: GoogleFonts.adamina(fontSize: 20,color: Colors.black),),
         backgroundColor: Colors.green,
-
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farm_wise/CropDetailsText/HealthyCrop.dart';
+import 'package:farm_wise/CropDetailsText/IrrigationCrop.dart';
+import 'package:farm_wise/CropDetailsText/TimeCrop.dart';
 import 'package:farm_wise/Screen/MainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,6 +26,11 @@ class CropDetails extends StatefulWidget {
 
 class _CropDetailsState extends State<CropDetails> {
   bool _isDeleting = false;
+  String ActiveScreen = 'Time';
+
+  void setActiveScreen(String activeScreen) {
+    ActiveScreen = activeScreen;
+  }
 
   Future<void> _deleteCrop() async {
     bool? confirmDelete = await showDialog<bool>(
@@ -125,54 +133,66 @@ class _CropDetailsState extends State<CropDetails> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      buildActionButton(label: 'Time', fontSize: 20),
+                      buildActionButton(
+                          label: 'Time',
+                          fontSize: 20,
+                          onTap: () {
+                            setState(() {
+                              setActiveScreen('Time');
+                            });
+                          }),
                       const SizedBox(height: 12),
-                      buildActionButton(label: 'Healthy', fontSize: 20),
+                      buildActionButton(
+                          label: 'Healthy',
+                          fontSize: 20,
+                          onTap: () {
+                            setState(() {
+                              setActiveScreen('Healthy');
+                            });
+                          }),
                       const SizedBox(height: 12),
-                      buildActionButton(label: 'Irrigation', fontSize: 18),
+                      buildActionButton(
+                          label: 'Irrigation',
+                          fontSize: 18,
+                          onTap: () {
+                            setState(() {
+                              setActiveScreen('Irrigation');
+                            });
+                          }),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 30),
-            const Align(
+             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Crop Details',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+                ActiveScreen,
+                style:GoogleFonts.adamina(color: Colors.black,fontSize: 22,fontWeight: FontWeight.w900 )
               ),
             ),
             const SizedBox(height: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                Text(
-                  "Name: ${widget.crop.name}",
-                  style: KTextStyle,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Planted Date: ${_formatDate(widget.crop.plantDate)}",
-                  style: KTextStyle,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Harvest Info: ${widget.crop.irrigationGuide ?? "N/A"}",
-                  style: KTextStyle,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Soil Type: ${widget.crop.soilType ?? "N/A"}",
-                  style: KTextStyle,
-                ),
-              ],
-            ),
+            if (ActiveScreen == 'Irrigation')
+              IrrigationCrop(
+                  irrigationcrop: widget.crop.irrigationGuide,
+                  waterRequirement: widget.crop.waterRequirement),
+            if (ActiveScreen == 'Healthy')
+              Healthycrop(
+                  fertilizers: widget.crop.fertilizers,
+                  soilType: widget.crop.soilType,
+                  sunlight: widget.crop.sunlight,
+                  irrigationCrop: widget.crop.irrigationGuide,
+                  ),
+            if (ActiveScreen == 'Time')
+              TimeCrop(
+                harvestDate: widget.crop.harvestDate,
+                bestPlantingSeason: widget.crop.bestPlantingSeason,
+                cropName: widget.crop.name,
+                growingTime: widget.crop.growingTime,
+                harvestDateNumber: widget.crop.harvestDateNumber,
+                plantDate: widget.crop.plantDate,
+              ),
             const Spacer(),
             SizedBox(
               height: 55,
@@ -187,7 +207,8 @@ class _CropDetailsState extends State<CropDetails> {
                 ),
                 child: _isDeleting
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : Text('Delete Crop', style: KTextStyle.copyWith(color: Colors.white)),
+                    : Text('Delete Crop',
+                        style: KTextStyle.copyWith(color: Colors.white)),
               ),
             ),
           ],

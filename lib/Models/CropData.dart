@@ -2,18 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CropData {
   final String cropId;
-  final String name;
-  final String bestPlantingSeason;
-  final String fertilizers;
-  final int growingTime; // in days
-  final int harvestDateNumber; // in days
-  final String irrigationGuide;
-  final String soilType;
-  final String sunlight;
-  final String type;
-  final String waterRequirement;
-  final DateTime? harvestDate;
-  final DateTime? plantDate;
+  final String name;// Crop name
+  final String bestPlantingSeason;//Time
+  final String fertilizers;//Healthe
+  final int growingTime; //Time
+  final int harvestDateNumber; //Time
+  final String irrigationGuide;//Irrigation
+  final String soilType;//Healthe
+  final String sunlight;//Healthe
+  final String type;//Crop Name
+  final String waterRequirement;//Irrigation
+  final DateTime? harvestDate;//Time
+  final DateTime? plantDate;//Time
 
   CropData({
     required this.cropId,

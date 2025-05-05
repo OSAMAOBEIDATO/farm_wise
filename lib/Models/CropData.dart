@@ -48,6 +48,8 @@ class CropData {
     };
   }
 
+
+
   factory CropData.fromMap(Map<String, dynamic> map) {
     return CropData(
       cropId: map['CropID'] ?? '',

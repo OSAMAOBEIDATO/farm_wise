@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/CropCalendarScreen.dart';
-import 'package:farm_wise/Screen/DiseaseScreen.dart';
+import 'package:farm_wise/Screen/CropDiseaseDetectionScreen.dart';
 import 'package:farm_wise/Screen/ProfileScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 

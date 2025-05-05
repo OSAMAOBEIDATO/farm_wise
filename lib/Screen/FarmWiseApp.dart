@@ -1,7 +1,6 @@
-import 'package:farm_wise/Screen/CropDetails.dart';
-import 'package:farm_wise/Screen/LoginScreen.dart';
-import 'package:farm_wise/Screen/ProfileScreen.dart';
-import 'package:farm_wise/Screen/SplashScreen.dart';
+import 'package:farm_wise/Screen/HomeScreen.dart';
+import 'package:farm_wise/Screen/MainScreen.dart';
+import 'package:farm_wise/service/AuthWrapper.dart';
 import 'package:flutter/material.dart';
 
 class FarmWiseApp extends StatelessWidget {
@@ -14,9 +13,9 @@ class FarmWiseApp extends StatelessWidget {
       title: "Farm Wise App",
       theme: ThemeData(
           primarySwatch: Colors.green,
-          useMaterial3: true
+          useMaterial3: true,
       ),
-      home:  const LoginScreen(),
+      home:  const AuthWrapper(),
     );
   }
 }

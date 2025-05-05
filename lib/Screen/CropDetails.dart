@@ -36,16 +36,25 @@ class _CropDetailsState extends State<CropDetails> {
     bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Crop'),
-        content: Text('Are you sure you want to delete ${widget.crop.name}?'),
+        title:  Text('Delete Crop',style: GoogleFonts.adamina(fontSize: 20),),
+        icon: const Icon(
+          Icons.delete_rounded,
+          color: Colors.red,
+          size: 30,
+        ),
+        content: Text(
+          'Are you sure you want to delete ${widget.crop.name}?',
+          style: GoogleFonts.adamina(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('Delete',
+                style: TextStyle(color: Colors.red, fontSize: 20)),
           ),
         ],
       ),
@@ -117,13 +126,6 @@ class _CropDetailsState extends State<CropDetails> {
                       'assets/Image/splashScreen.png',
                       height: 250,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset(
-                          'assets/Image/splashScreen.png',
-                          height: 250,
-                          fit: BoxFit.cover,
-                        );
-                      },
                     ),
                   ),
                 ),
@@ -165,12 +167,13 @@ class _CropDetailsState extends State<CropDetails> {
               ],
             ),
             const SizedBox(height: 30),
-             Align(
+            Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                ActiveScreen,
-                style:GoogleFonts.adamina(color: Colors.black,fontSize: 22,fontWeight: FontWeight.w900 )
-              ),
+              child: Text(ActiveScreen,
+                  style: GoogleFonts.adamina(
+                      color: Colors.black,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900)),
             ),
             const SizedBox(height: 10),
             if (ActiveScreen == 'Irrigation')
@@ -179,11 +182,11 @@ class _CropDetailsState extends State<CropDetails> {
                   waterRequirement: widget.crop.waterRequirement),
             if (ActiveScreen == 'Healthy')
               Healthycrop(
-                  fertilizers: widget.crop.fertilizers,
-                  soilType: widget.crop.soilType,
-                  sunlight: widget.crop.sunlight,
-                  irrigationCrop: widget.crop.irrigationGuide,
-                  ),
+                fertilizers: widget.crop.fertilizers,
+                soilType: widget.crop.soilType,
+                sunlight: widget.crop.sunlight,
+                irrigationCrop: widget.crop.irrigationGuide,
+              ),
             if (ActiveScreen == 'Time')
               TimeCrop(
                 harvestDate: widget.crop.harvestDate,

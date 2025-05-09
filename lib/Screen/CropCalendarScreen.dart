@@ -6,6 +6,8 @@ import 'package:farm_wise/Components/SnakBar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../Common/Constant.dart';
+
 class CropCalendarScreen extends StatefulWidget {
   const CropCalendarScreen({super.key});
 
@@ -50,7 +52,7 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
 
       final events = <DateTime, List<Map<String, dynamic>>>{};
       for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         final plantDate = (data['PlantDate'] as Timestamp?)?.toDate();
         final harvestDate = (data['HarvestDate'] as Timestamp?)?.toDate();
         final cropName = data['CropName'] as String;
@@ -109,7 +111,7 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
             .collection('crops')
             .doc(cropId)
             .update({
-          'HarvestDate': Timestamp.fromDate(newDate.add(Duration(days: 30))), // Example harvest delay
+          'HarvestDate': Timestamp.fromDate(newDate.add(const Duration(days: 30))), // Example harvest delay
         });
       }
       CustomSnackBar().ShowSnackBar(
@@ -232,8 +234,9 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
               Text(
                 'Events for ${DateFormat('yyyy-MM-dd').format(_selectedDay ?? DateTime.now())}',
                 style: GoogleFonts.adamina(
-                  fontSize: 14,
+                  fontSize: 17,
                   color: Colors.green[700],
+                  fontWeight: FontWeight.w600
                 ),
               ),
               DropdownButton<String>(
@@ -242,22 +245,22 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
                   'Filter',
                   style: TextStyle(color: Colors.green[700], fontSize: 14),
                 ),
-                items: const [
+                items:  [
                   DropdownMenuItem<String>(
                     value: null,
-                    child: Text('All'),
+                    child: Text('All',style: KTextStyleForType),
                   ),
                   DropdownMenuItem<String>(
                     value: 'Fruit',
-                    child: Text('Fruit'),
+                    child: Text('Fruit',style: KTextStyleForType),
                   ),
                   DropdownMenuItem<String>(
                     value: 'Vegetable',
-                    child: Text('Vegetable'),
+                    child: Text('Vegetable',style: KTextStyleForType),
                   ),
                   DropdownMenuItem<String>(
                     value: 'Grain',
-                    child: Text('Grain'),
+                    child: Text('Grain',style: KTextStyleForType,),
                   ),
                 ],
                 onChanged: (value) {
@@ -273,7 +276,7 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
         // Events list
         Expanded(
           child: _selectedDay == null
-              ? Center(
+              ? const Center(
             child: Text(
               'Select a date to see events',
               style: TextStyle(fontSize: 16),
@@ -363,7 +366,7 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: _selectedDay == null
-                ? Center(
+                ? const Center(
               child: Text(
                 'Select a date to see events',
                 style: TextStyle(fontSize: 16),
@@ -481,22 +484,22 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
         return Card(
           color: eventColor.withOpacity(0.2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: BorderSide(color: eventColor, width: 1),
+            borderRadius: BorderRadius.circular(15),
+            side: BorderSide(color: eventColor, width: 1.5),
           ),
           margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           child: ListTile(
             leading: Icon(eventIcon, color: eventColor),
             title: Text(
               event['title'],
-              style: TextStyle(
+              style: GoogleFonts.adamina(
                 fontWeight: FontWeight.w500,
                 color: Colors.black87,
               ),
             ),
             subtitle: Text(
               event['cropType'] ?? 'Unknown type',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black54,
               ),
             ),

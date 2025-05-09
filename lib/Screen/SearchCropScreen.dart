@@ -177,18 +177,27 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
               int.parse(dateParts[1]),
               int.parse(dateParts[0]),
             );
-            // Calculate harvestDate by adding harvestDateNumber to plantDate
-            int harvestDays = crop['harvestDateNumber'] ?? 0;
-            harvestDateTime =
-                plantDateTime.add(Duration(days: harvestDays));
+
+            QuerySnapshot cropDetailSnapshot = await FirebaseFirestore.instance
+                .collection('crops')
+                .where('name', isEqualTo: crop['name'])
+                .limit(1)
+                .get();
+
+            int harvestDays = 0;
+            if (cropDetailSnapshot.docs.isNotEmpty) {
+              var cropDetails = cropDetailSnapshot.docs.first.data() as Map<String, dynamic>;
+              harvestDays = cropDetails['harvestDateNumber'] ?? 0;
+            }
+
+            harvestDateTime = plantDateTime.add(Duration(days: harvestDays));
           }
+
 
           if (_existingCropNames.contains(crop['name'].toLowerCase())) {
             failedCrops.add("${crop['name']} (already in your crops)");
             continue;
           }
-
-
 
           final docRef = await FirebaseFirestore.instance
               .collection("users")

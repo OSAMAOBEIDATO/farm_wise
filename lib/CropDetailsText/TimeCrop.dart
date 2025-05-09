@@ -32,7 +32,7 @@ class TimeCrop extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$cropName is a crop best planted during the $bestPlantingSeason season. '
+          '$cropName best planted during the $bestPlantingSeason season. '
               'It was planted on ${_formatDate(plantDate)} and typically takes about $growingTime days to grow. '
               'Based on this, the expected harvest time is around $harvestDateNumber days after planting, '
               'approximately on ${_formatDate(harvestDate)}.',

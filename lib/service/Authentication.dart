@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthService {
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -113,7 +114,7 @@ class AuthService {
         email: email,
         password: password,
       );
-      return "Successfully";
+      return "Successfully";//TODO Level Two
     } on FirebaseAuthException catch (e) {
       print('Firebase Auth error during sign-in: ${e.code} - ${e.message}'); // Debug log
       switch (e.code) {
@@ -166,6 +167,7 @@ class AuthService {
       return null;
     }
   }
+
   Future<String> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
@@ -174,6 +176,7 @@ class AuthService {
       return "Error sending password reset email: $e";
     }
   }
+
   Future<String> signUpWithFacebook() async {
     String firstName = '';
     String lastName = '';

@@ -43,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         throw Exception('No user is currently authenticated');
       }
 
-      // Fetch user data from Firestore
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(_userId)
@@ -75,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'firstName': firstName,
           'lastName': lastName,
           'email': email,
-          'phoneNumber': null, // Will be updated later if needed
+          'phoneNumber': null,
           'createdAt': FieldValue.serverTimestamp(),
         });
 

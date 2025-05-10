@@ -1,3 +1,4 @@
+import 'package:farm_wise/Screen/MainScreen.dart';
 import 'package:flutter/material.dart';
 
 class CropDiseaseDetectionScreen extends StatelessWidget {
@@ -40,10 +41,7 @@ class CropDiseaseDetectionScreen extends StatelessWidget {
             Center(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Simulate taking a photo and showing results
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Photo captured! Processing...')),
-                  );
+                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(),));
                 },
                 icon: const Icon(Icons.camera),
                 label: const Text('Take Photo'),

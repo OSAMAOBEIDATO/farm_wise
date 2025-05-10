@@ -216,13 +216,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.push(//TODO
                       context,
                       MaterialPageRoute(
                         builder: (context) => const ForgotPasswordScreen(),
                       ),
                     );
-                  },//TODO: Add forgot password screen
+                  },
                   child: Text(
                     "Forget Password?",
                     style: TextStyle(color: Colors.green[500]),
@@ -230,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              SizedBox(
+              SizedBox(//TODO Level Two
                 height: 55,
                 width: double.infinity,
                 child: ElevatedButton(

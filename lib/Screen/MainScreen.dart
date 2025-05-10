@@ -1,13 +1,11 @@
-// MainScreen.dart
 import 'package:flutter/material.dart';
 import 'package:farm_wise/Screen/HomeScreen.dart';
 import 'package:farm_wise/Screen/CropCalendarScreen.dart';
-import 'package:farm_wise/Screen/DiseaseScreen.dart';
+import 'package:farm_wise/Screen/CropDiseaseDetectionScreen.dart';
 import 'package:farm_wise/Screen/ProfileScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MainScreen extends StatefulWidget {
-
   const MainScreen({super.key});
 
   @override
@@ -23,9 +21,9 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _screens = <Widget>[
-       const HomeScreen(),
+      const HomeScreen(),
       const CropDiseaseDetectionScreen(),
-      CropCalendarScreen(),
+      const CropCalendarScreen(),
       const ProfileScreen(),
     ];
   }
@@ -51,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: 'Disease'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Calendar'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month_sharp), label: 'Calendar'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

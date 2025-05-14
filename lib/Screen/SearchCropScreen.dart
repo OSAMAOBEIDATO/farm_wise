@@ -177,8 +177,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
               int.parse(dateParts[1]),
               int.parse(dateParts[0]),
             );
-            // Calculate harvestDate by adding harvestDateNumber to plantDate
-            int harvestDays = crop['harvestDateNumber'] ?? 0;
+            int harvestDays = crop['harvestDate'] ??0 ;
             harvestDateTime =
                 plantDateTime.add(Duration(days: harvestDays));
           }
@@ -200,7 +199,6 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             'CropName': crop['name'],
             'PlantDate': plantDateTime != null ? Timestamp.fromDate(plantDateTime) : null,
             'HarvestDate': harvestDateTime != null ? Timestamp.fromDate(harvestDateTime) : null,
-            'PlantType': crop['type'],
             'fertilizers': crop['fertilizers'] ?? [],
             'createdAt': FieldValue.serverTimestamp(),
           });

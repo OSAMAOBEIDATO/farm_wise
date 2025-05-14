@@ -34,8 +34,7 @@ class TimeCrop extends StatelessWidget {
         Text(
           '$cropName is a crop best planted during the $bestPlantingSeason season. '
               'It was planted on ${_formatDate(plantDate)} and typically takes about $growingTime days to grow. '
-              'Based on this, the expected harvest time is around $harvestDateNumber days after planting, '
-              'approximately on ${_formatDate(harvestDate)}.',
+              'Based on this, the expected harvest time is  ${_formatDate(plantDate)} days after planting ',
           style: KTextStyle,
           textAlign: TextAlign.justify,
         ),

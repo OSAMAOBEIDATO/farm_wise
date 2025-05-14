@@ -121,10 +121,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           context: context,
           text: 'Logged out successfully!',
         );
-        // Navigate to LoginScreen and clear navigation stack
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (_) =>  LoginScreen()),
+          MaterialPageRoute(builder: (_) =>  const LoginScreen()),
               (route) => false,
         );
       } else {

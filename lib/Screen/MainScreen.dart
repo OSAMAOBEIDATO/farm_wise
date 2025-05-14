@@ -7,7 +7,6 @@ import 'package:farm_wise/Screen/ProfileScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MainScreen extends StatefulWidget {
-
   const MainScreen({super.key});
 
   @override
@@ -16,16 +15,15 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-
   late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
     _screens = <Widget>[
-       const HomeScreen(),
+      const HomeScreen(),
       const CropDiseaseDetectionScreen(),
-      CropCalendarScreen(),
+      const CropCalendarScreen(),
       const ProfileScreen(),
     ];
   }
@@ -51,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: 'Disease'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Calendar'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month_rounded), label: 'Calendar'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

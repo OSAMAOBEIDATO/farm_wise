@@ -1,8 +1,6 @@
 import 'package:farm_wise/Screen/LoginScreen.dart';
-import 'package:farm_wise/Screen/MainScreen.dart';
 import 'package:flutter/material.dart';
 
-import 'AddDataForFirebase.dart';
 
 class SpalshScreen extends StatefulWidget {
 

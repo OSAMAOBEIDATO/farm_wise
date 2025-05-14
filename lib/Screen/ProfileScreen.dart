@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farm_wise/Screen/HelpAndSupportScreen.dart';
 import 'package:farm_wise/service/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -50,8 +51,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .get();
 
       if (snapshot.exists) {
-        _user = UserModel.fromMap(_userId!, snapshot.data() as Map<String, dynamic>);
-        print('ProfileScreen: Fetched user data - email: ${_user!.email}, name: ${_user!.firstName} ${_user!.lastName}');
+        _user = UserModel.fromMap(
+            _userId!, snapshot.data() as Map<String, dynamic>);
+        print(
+            'ProfileScreen: Fetched user data - email: ${_user!.email}, name: ${_user!.firstName} ${_user!.lastName}');
       } else {
         print('ProfileScreen: User document not found, creating new document');
         // Create a new user document if it doesn't exist
@@ -86,8 +89,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .get();
 
         if (snapshot.exists) {
-          _user = UserModel.fromMap(_userId!, snapshot.data() as Map<String, dynamic>);
-          print('ProfileScreen: Created and fetched user data - email: ${_user!.email}, name: ${_user!.firstName} ${_user!.lastName}');
+          _user = UserModel.fromMap(
+              _userId!, snapshot.data() as Map<String, dynamic>);
+          print(
+              'ProfileScreen: Created and fetched user data - email: ${_user!.email}, name: ${_user!.firstName} ${_user!.lastName}');
         } else {
           throw Exception('Failed to create user document');
         }
@@ -123,8 +128,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (_) =>  const LoginScreen()),
-              (route) => false,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
         );
       } else {
         throw Exception(result);
@@ -147,7 +152,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onRefresh: _fetchUserData,
         color: Colors.green,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.green))
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.green))
             : _buildContent(),
       ),
     );
@@ -186,14 +192,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     radius: 50,
                     backgroundColor: Colors.green[100],
                     child: Text(
-                      _user!.firstName.isNotEmpty ? _user!.firstName[0].toUpperCase() : 'O',
+                      _user!.firstName.isNotEmpty
+                          ? _user!.firstName[0].toUpperCase()
+                          : 'O',
                       style: const TextStyle(fontSize: 40, color: Colors.green),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     '${_user!.firstName} ${_user!.lastName}',
-                    style: KTextStyle.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: KTextStyle.copyWith(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -279,11 +288,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.help, color: Colors.green),
               title: const Text('Help & Support'),
               onTap: () {
-                CustomSnackBar().ShowSnackBar(
-                  context: context,
-                  text: 'Help & Support feature coming soon!',
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HelpSupportScreen(),
+                  ),
                 );
-                // TODO: Implement help & support
               },
             ),
             ListTile(

@@ -1,3 +1,4 @@
+import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/Models/CropData.dart';
 import 'package:farm_wise/Screen/CropDetails.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:farm_wise/Screen/LoginScreen.dart';
 import 'package:farm_wise/components/CardWeatherTile.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:weather/weather.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,11 +21,19 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadingCrops = true;
   String? _fetchError;
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
+  final WeatherFactory _wf = WeatherFactory(open_Waether_APA_Key);
+
+  Weather? _weather;
 
   @override
   void initState() {
     super.initState();
     _fetchUserCrops();
+    _wf.currentWeatherByCityName("Irbid").then((value) {
+      setState(() {
+        _weather = value;
+      });
+    });
   }
 
   Future<void> _fetchUserCrops() async {
@@ -31,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoadingCrops = true;
       _fetchError = null;
     });
-
     try {
       if (userId == null) {
         throw Exception('No user is currently authenticated');
@@ -55,9 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (cropDetailSnapshot.docs.isNotEmpty) {
           var cropDetails =
-          cropDetailSnapshot.docs.first.data() as Map<String, dynamic>;
+              cropDetailSnapshot.docs.first.data() as Map<String, dynamic>;
           cropData['harvestDays'] = cropDetails['harvestDateNumber'] ?? 0;
-          cropData['bestPlantingSeason'] = cropDetails['bestPlantingSeason'] ?? '';
+          cropData['bestPlantingSeason'] =
+              cropDetails['bestPlantingSeason'] ?? '';
           cropData['fertilizers'] = cropDetails['fertilizers'] ?? '';
           cropData['growingTime'] = cropDetails['growingTime'] ?? 0;
           cropData['irrigationGuide'] = cropDetails['irrigationGuide'] ?? '';
@@ -65,18 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           cropData['sunlight'] = cropDetails['sunlight'] ?? '';
           cropData['type'] = cropDetails['type'] ?? '';
           cropData['waterRequirement'] = cropDetails['waterRequirement'] ?? '';
-        } else {
-          cropData['harvestDays'] = 0;
-          cropData['bestPlantingSeason'] = '';
-          cropData['fertilizers'] = '';
-          cropData['growingTime'] = 0;
-          cropData['irrigationGuide'] = '';
-          cropData['soilType'] = '';
-          cropData['sunlight'] = '';
-          cropData['type'] = '';
-          cropData['waterRequirement'] = '';
         }
-
         userCrops.add(cropData);
       }
 
@@ -101,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(
               builder: (_) => const LoginScreen(),
             ),
-                (route) => false,
+            (route) => false,
           );
         });
       }
@@ -115,6 +114,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(body: _buildUI());
+  }
+
+  Widget _buildUI() {
+    if (_weather == null) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: Colors.green,
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
@@ -134,101 +145,105 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 CardWeatherTile(
                     icon: Icons.wb_sunny,
-                    value: '13°C',
+                    value: _weather!.tempMax.toString(),
                     label: 'Partially sunny',
                     iconColor: Colors.orange),
                 CardWeatherTile(
                     icon: Icons.cloud,
-                    value: '10%',
+                    value: _weather!.rainLast3Hours.toString(),
                     label: 'Precipitation',
                     iconColor: Colors.blue),
                 CardWeatherTile(
                     icon: Icons.opacity,
-                    value: '61%',
+                    value: _weather!.humidity.toString(),
                     label: 'Humidity',
                     iconColor: Colors.blue),
                 CardWeatherTile(
                     icon: Icons.air,
-                    value: '5 km/h',
+                    value: _weather!.windSpeed.toString(),
                     label: 'Wind',
                     iconColor: Colors.grey),
                 CardWeatherTile(
                     icon: Icons.terrain,
-                    value: '24.5%',
+                    value: _weather!.weatherMain.toString(),
                     label: 'Soil moisture',
                     iconColor: Colors.brown),
                 CardWeatherTile(
-                    icon: Icons.check_circle,
-                    value: 'Healthy',
-                    label: 'Crop Health',
+                    icon: Icons.ac_unit,
+                    value: _weather!.windGust.toString(),
+                    label: 'wind Gust',
                     iconColor: Colors.green),
               ],
             ),
             const SizedBox(height: 20),
-             Text('Your Crops',
-                style: GoogleFonts.adamina(fontSize: 18,fontWeight: FontWeight.bold)),
+            Text('Your Crops',
+                style: GoogleFonts.adamina(
+                    fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             if (_isLoadingCrops)
-              const Center(child: CircularProgressIndicator(color: Colors.green))
+              const Center(
+                  child: CircularProgressIndicator(color: Colors.green))
             else if (_fetchError != null)
               Center(
                   child: Text('Error: $_fetchError',
                       style: const TextStyle(color: Colors.red, fontSize: 16)))
             else if (_userCrops.isEmpty)
-                const Center(child: Text('No crops found'))
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _userCrops.length,
-                  itemBuilder: (context, index) {
-                    final crop = _userCrops[index];
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      margin: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  crop.name,
-                                  style: const TextStyle(
-                                      fontSize: 20, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 8),
-                                Text("Type: ${crop.type}"),
-                                Text("Planted on: ${_formatDate(crop.plantDate)}"),
-                                Text("Harvest on: ${_formatDate(crop.harvestDate)}"),
-                              ],
-                            ),
+              const Center(child: Text('No crops found'))
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _userCrops.length,
+                itemBuilder: (context, index) {
+                  final crop = _userCrops[index];
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                crop.name,
+                                style: const TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              Text("Type: ${crop.type}"),
+                              Text(
+                                  "Planted on: ${_formatDate(crop.plantDate)}"),
+                              Text(
+                                  "Harvest on: ${_formatDate(crop.harvestDate)}"),
+                            ],
                           ),
-                          InkWell(
-                            onTap: () {
-                               Navigator.push(
-                                 context,
-                                 MaterialPageRoute(
-                                  builder: (context) => CropDetails(
-                                     userId: userId!,
-                                    crop: crop,
-                                  ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CropDetails(
+                                  userId: userId!,
+                                  crop: crop,
                                 ),
-                               );
-                            },
-                            child: const Icon(Icons.menu, size: 30),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                              ),
+                            );
+                          },
+                          child: const Icon(Icons.menu, size: 30),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),

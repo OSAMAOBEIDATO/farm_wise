@@ -1,7 +1,18 @@
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-// import 'package:farm_wise/Models/WeatherDataModel.dart';
-//
+import 'dart:convert';
+import 'package:farm_wise/Common/Constant.dart';
+import 'package:http/http.dart' as http;
+import 'package:weather/weather.dart';
+
+class WeatherService {
+
+
+
+}
+
+
+
+
+
 // class WeatherService {
 //   static const String _apiKey = 'your_api_key'; // Replace with your OpenWeatherMap API key
 //   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
@@ -11,7 +22,6 @@
 //     if (!serviceEnabled) {
 //       throw Exception('Location services are disabled.');
 //     }
-
 //     LocationPermission permission = await Geolocator.checkPermission();
 //     if (permission == LocationPermission.denied) {
 //       permission = await Geolocator.requestPermission();

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/Screen/ForgetPasswordScreen.dart';
@@ -10,9 +12,9 @@ import 'package:farm_wise/components/FacebookSignUp.dart';
 import 'package:farm_wise/components/ReusableTextField.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class LoginScreen extends StatefulWidget {
-
   const LoginScreen({super.key});
 
   @override
@@ -20,10 +22,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   bool isLoading = false;
 
   @override
@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signInUser() async {
-
     setState(() {
       isLoading = true;
     });
@@ -55,9 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => MainScreen()
-          ),
+          MaterialPageRoute(builder: (context) => MainScreen()),
         );
       } else {
         CustomSnackBar().ShowSnackBar(
@@ -78,13 +75,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signUpWithFacebook() async {
     final String? userId = AuthService().getCurrentUserId();
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
     final userData = userDoc.data();
 
     if (userId == null) {
       CustomSnackBar().ShowSnackBar(
-        context: context,
-        text: 'Failed to retrieve user ID after sign-up.');
+          context: context, text: 'Failed to retrieve user ID after sign-up.');
     }
 
     setState(() {
@@ -126,7 +123,6 @@ class _LoginScreenState extends State<LoginScreen> {
           );
           return;
         }
-
 
         if (userData != null && userData['phoneNumber'] == null) {
           CustomSnackBar().ShowSnackBar(
@@ -222,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         builder: (context) => const ForgotPasswordScreen(),
                       ),
                     );
-                  },//TODO: Add forgot password screen
+                  }, //TODO: Add forgot password screen
                   child: Text(
                     "Forget Password?",
                     style: TextStyle(color: Colors.green[500]),

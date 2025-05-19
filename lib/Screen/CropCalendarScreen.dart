@@ -23,7 +23,6 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
   String? _userId;
   String? _selectedCropType;
 
-  // Define colors for crop types
   static const fruitColor = Color.fromRGBO(200, 80, 80, 1.0); // Soft red
   static const vegetableColor = Colors.green; // Green
   static const grainColor = Color.fromRGBO(161, 136, 127, 1.0); // Light brown

@@ -10,7 +10,7 @@ android {
     namespace = "com.example.farm_wise"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
-    compileSdk 34
+    compileSdk 35
     ndkVersion '29.0.13113456'
 
     compileOptions {

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:farm_wise/Screen/HelpAndSupportScreen.dart';
+import 'package:farm_wise/Screen/Notifications.dart';
 import 'package:farm_wise/service/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +8,7 @@ import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/Models/UserModel.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -57,13 +58,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'ProfileScreen: Fetched user data - email: ${_user!.email}, name: ${_user!.firstName} ${_user!.lastName}');
       } else {
         print('ProfileScreen: User document not found, creating new document');
-        // Create a new user document if it doesn't exist
         User? firebaseUser = FirebaseAuth.instance.currentUser;
         if (firebaseUser == null) {
           throw Exception('Cannot create user document: No authenticated user');
         }
 
-        // Extract name and email from Firebase Authentication
         String firstName = '';
         String lastName = '';
         String email = firebaseUser.email ?? '';
@@ -73,7 +72,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
         }
 
-        // Create the user document
         await FirebaseFirestore.instance.collection('users').doc(_userId).set({
           'firstName': firstName,
           'lastName': lastName,
@@ -218,87 +216,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            // Account Settings Section
-            const Text(
+            Text(
               'Account Settings',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.adamina(
+                  fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.local_florist, color: Colors.green),
-              title: const Text('Crop Options'),
+              title: Text(
+                'Crop Options',
+                style: GoogleFonts.adamina(fontWeight: FontWeight.normal),
+              ),
               onTap: () {
-                if (_userId != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SearchCropScreen(),
-                    ),
-                  );
-                } else {
-                  CustomSnackBar().ShowSnackBar(
-                    context: context,
-                    text: 'Error: User ID not available',
-                  );
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.notifications, color: Colors.green),
-              title: const Text('Notifications'),
-              onTap: () {
-                CustomSnackBar().ShowSnackBar(
-                  context: context,
-                  text: 'Notifications feature coming soon!',
-                );
-                // TODO: Implement notifications screen
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.security, color: Colors.green),
-              title: const Text('Security'),
-              onTap: () {
-                CustomSnackBar().ShowSnackBar(
-                  context: context,
-                  text: 'Security settings coming soon!',
-                );
-                // TODO: Implement security settings
-              },
-            ),
-
-            const SizedBox(height: 24),
-            // Help and Support Section
-            const Text(
-              'Help and Support',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(Icons.share, color: Colors.green),
-              title: const Text('Share App'),
-              onTap: () {
-                CustomSnackBar().ShowSnackBar(
-                  context: context,
-                  text: 'App sharing feature coming soon!',
-                );
-                // TODO: Implement app sharing
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.help, color: Colors.green),
-              title: const Text('Help & Support'),
-              onTap: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const HelpSupportScreen(),
+                    builder: (_) => SearchCropScreen(),
                   ),
                 );
               },
             ),
             ListTile(
+              leading: const Icon(Icons.notifications_none_outlined,
+                  color: Colors.green),
+              title: Text('Notifications',
+                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsCard(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.security, color: Colors.green),
+              title: Text('Security',
+                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+              onTap: () {},
+            ),
+
+            const SizedBox(height: 24),
+            Text(
+              'Help and Support',
+              style: GoogleFonts.adamina(
+                  fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.share, color: Colors.green),
+              title: Text('Share App',
+                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.help, color: Colors.green),
+              title: Text('Help & Support',
+                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+              onTap: () {},
+            ),
+            ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout'),
+              title: Text('Logout',
+                  style: GoogleFonts.adamina(fontWeight: FontWeight.w900)),
               onTap: _logout,
             ),
           ],

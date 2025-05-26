@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:math';
-import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Models/UserModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,28 +7,26 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+
   String? validPassword(String password) {
     if (password.length < 8) {
       return 'Password must be at least 8 characters long.';
-    }
-    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+    } else if (!RegExp(r'[A-Z]').hasMatch(password)) {
       return 'Password must contain at least one uppercase letter.';
-    }
-    if (!RegExp(r'[a-z]').hasMatch(password)) {
+    } else if (!RegExp(r'[a-z]').hasMatch(password)) {
       return 'Password must contain at least one lowercase letter.';
-    }
-    if (!RegExp(r'[1-9]').hasMatch(password)) {
+    } else if (!RegExp(r'[1-9]').hasMatch(password)) {
       return 'Password must contain at least one number.';
-    }
-    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
+    } else if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
       return 'Password must contain at least one special character.';
     }
     return null;
   }
 
   String? validateEmailDomain(String email) {
-    if (!email.endsWith("@gmail.com")) {
-      return 'Only Gmail addresses are allowed (e.g., user@gmail.com).';
+    const allowedDomains = ['@gmail.com', '@hotmail.com', '@yahoo.com','@cit.just.edu.jo','outlook.com',];
+    if (!allowedDomains.any((domain) => email.toLowerCase().endsWith(domain))) {
+      return 'Only Gmail or Hotmail addresses are allowed (e.g., user@gmail.com or user@hotmail.com).';
     }
     return null;
   }
@@ -53,40 +48,44 @@ class AuthService {
     required String lastName,
     required String phoneNumber,
   }) async {
-    String res = "Some error Occurred";
     try {
-      if (email.isNotEmpty ||
-          password.isNotEmpty ||
-          firstName.isNotEmpty ||
-          lastName.isNotEmpty ||
-          phoneNumber.isNotEmpty) {
-        final passwordError = validPassword(password);
-        if (passwordError != null) {
-          return Future.value(passwordError);
-        }
-        final emailError = validateEmailDomain(email);
-        if (emailError != null) {
-          return Future.value(emailError);
-        }
-        final phoneError = validatePhoneNumber(phoneNumber);
-        if (phoneError != null) {
-          return Future.value(phoneError);
-        }
-        // Register user in auth with email and password
-        UserCredential cred = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-        // Add user to your Firestore database
-        await _firestore.collection("users").doc(cred.user?.uid).set({
-          'firstName': firstName,
-          'lastName': lastName,
-          'phoneNumber': phoneNumber,
-          'email': email,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        return res = "Successfully";
+      if (email.isEmpty || password.isEmpty || firstName.isEmpty || lastName.isEmpty || phoneNumber.isEmpty) {
+        return 'Please fill in all fields.';
       }
+
+      final passwordError = validPassword(password);
+      if (passwordError != null) {
+        return passwordError;
+      }
+
+      // Validate email domain
+      final emailError = validateEmailDomain(email);
+      if (emailError != null) {
+        return emailError;
+      }
+
+      // Validate phone number
+      final phoneError = validatePhoneNumber(phoneNumber);
+      if (phoneError != null) {
+        return phoneError;
+      }
+
+      // Register user in auth with email and password
+      UserCredential cred = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+
+      // Add user to Firestore
+      await _firestore.collection("users").doc(cred.user?.uid).set({
+        'firstName': firstName.trim(),
+        'lastName': lastName.trim(),
+        'phoneNumber': phoneNumber.trim(),
+        'email': email.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      return "Successfully";
     } on FirebaseAuthException catch (err) {
       switch (err.code) {
         case 'email-already-in-use':
@@ -100,9 +99,12 @@ class AuthService {
         default:
           return err.message ?? 'An error occurred during sign-up: ${err.code}';
       }
+    } catch (e) {
+      return 'An unexpected error occurred: $e';
     }
-    return res;
   }
+
+
 
   Future<String> signInUser({
     required String email,
@@ -110,8 +112,8 @@ class AuthService {
   }) async {
     try {
       await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: email.trim(),
+        password: password.trim(),
       );
       return "Successfully";
     } on FirebaseAuthException catch (e) {
@@ -166,21 +168,23 @@ class AuthService {
       return null;
     }
   }
+
   Future<String> sendPasswordResetEmail(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await _auth.sendPasswordResetEmail(email: email.trim());
       return "Successfully sent password reset email. Please check your inbox.";
     } catch (e) {
       return "Error sending password reset email: $e";
     }
   }
+
   Future<String> signUpWithFacebook() async {
     String firstName = '';
     String lastName = '';
 
     try {
       final LoginResult result = await FacebookAuth.instance.login(
-        permissions: ['public_profile'], // Removed 'email' to avoid scope error
+        permissions: ['public_profile', 'email'],
       );
 
       if (result.status != LoginStatus.success) {
@@ -194,8 +198,8 @@ class AuthService {
       if (accessToken == null) {
         return 'Failed to retrieve Facebook access token.';
       }
-      final OAuthCredential facebookCredential = FacebookAuthProvider.credential(accessToken.tokenString);
 
+      final OAuthCredential facebookCredential = FacebookAuthProvider.credential(accessToken.tokenString);
       final UserCredential userCredential = await _auth.signInWithCredential(facebookCredential);
       final User? user = userCredential.user;
 
@@ -216,12 +220,12 @@ class AuthService {
           return 'PromptForEmail:${user.uid}:${user.displayName ?? ''}';
         }
 
+        // Validate email domain before proceeding
         final emailError = validateEmailDomain(email);
         if (emailError != null) {
           await _auth.signOut();
           return emailError;
         }
-
 
         if (user.displayName != null) {
           final nameParts = user.displayName!.split(' ');
@@ -232,7 +236,7 @@ class AuthService {
         await _firestore.collection("users").doc(user.uid).set({
           'firstName': firstName,
           'lastName': lastName,
-          'phoneNumber': null, // Will be updated after prompt
+          'phoneNumber': null,
           'email': email,
           'createdAt': FieldValue.serverTimestamp(),
         });
@@ -258,6 +262,4 @@ class AuthService {
       return 'An unexpected error occurred: $e';
     }
   }
-
-
 }

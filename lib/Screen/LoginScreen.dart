@@ -218,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         builder: (context) => const ForgotPasswordScreen(),
                       ),
                     );
-                  }, //TODO: Add forgot password screen
+                  },
                   child: Text(
                     "Forget Password?",
                     style: TextStyle(color: Colors.green[500]),

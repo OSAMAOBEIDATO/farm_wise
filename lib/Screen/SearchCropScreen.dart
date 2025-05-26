@@ -200,6 +200,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             'PlantDate': plantDateTime != null ? Timestamp.fromDate(plantDateTime) : null,
             'HarvestDate': harvestDateTime != null ? Timestamp.fromDate(harvestDateTime) : null,
             'fertilizers': crop['fertilizers'] ?? [],
+            'type':crop['type'],
             'createdAt': FieldValue.serverTimestamp(),
           });
           await docRef.update({'CropID': docRef.id});

@@ -1,11 +1,11 @@
-import 'package:farm_wise/Common/Constant.dart';
-import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/Components/SnakBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class CropCalendarScreen extends StatefulWidget {
   const CropCalendarScreen({super.key});
@@ -54,7 +54,7 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
         final plantDate = (data['PlantDate'] as Timestamp?)?.toDate();
         final harvestDate = (data['HarvestDate'] as Timestamp?)?.toDate();
         final cropName = data['CropName'] as String;
-        final cropType = data['PlantType'] as String?;
+        final PlantType = data['PlantType'] as String? ?? data['type'] as String?;
         final cropId = doc.id;
 
         if (plantDate != null) {
@@ -64,7 +64,7 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
             'title': 'Planting $cropName',
             'id': cropId,
             'type': 'plant',
-            'cropType': cropType,
+            'cropType': PlantType,
           });
         }
         if (harvestDate != null) {
@@ -74,7 +74,7 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
             'title': 'Harvesting $cropName',
             'id': cropId,
             'type': 'harvest',
-            'cropType': cropType,
+            'cropType': PlantType,
           });
         }
       }

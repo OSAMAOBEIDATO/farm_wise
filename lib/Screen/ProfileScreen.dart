@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Screen/Notifications.dart';
+import 'package:farm_wise/Screen/SecurityScreen.dart';
 import 'package:farm_wise/service/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -255,7 +256,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.security, color: Colors.green),
               title: Text('Security',
                   style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const SecurityScreen()));
+              },
             ),
 
             const SizedBox(height: 24),

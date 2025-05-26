@@ -10,7 +10,7 @@ class CropData {
   final String irrigationGuide;//Irrigation
   final String soilType;//Healthe
   final String sunlight;//Healthe
-  final String type;//Crop Name
+  final String type;//Crop type
   final String waterRequirement;//Irrigation
   final DateTime? harvestDate;//Time
   final DateTime? plantDate;//Time
@@ -41,7 +41,7 @@ class CropData {
       'irrigationGuide': irrigationGuide,
       'soilType': soilType,
       'sunlight': sunlight,
-      'type': type,
+      'PlantType': type,
       'waterRequirement': waterRequirement,
       'HarvestDate': harvestDate != null ? Timestamp.fromDate(harvestDate!) : null,
       'PlantDate': plantDate != null ? Timestamp.fromDate(plantDate!) : null,

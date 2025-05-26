@@ -1,10 +1,10 @@
+import 'package:farm_wise/Components/SnakBar.dart';
 import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:farm_wise/Screen/LoginScreen.dart';
 import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/components/ReusableTextField.dart';
-import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -23,6 +23,62 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool isLoading = false;
 
+  Future<void> _signUpUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final String res = await AuthService().signupUser(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        phoneNumber: _phoneNumberController.text.trim(),
+      );
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (res == "Successfully") {
+        print(
+            "Sign-up successful, navigating to SearchCropScreen"); // Debug log
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SearchCropScreen(),
+          ),
+        );
+      } else {
+        print("Sign-up failed with response: $res"); // Debug log
+        CustomSnackBar().ShowSnackBar(
+          context: context,
+          text: res,
+        );
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print("Sign-up error: $e"); // Debug log
+      String errorMessage = 'An unexpected error occurred. Please try again.';
+      if (e.toString().contains('email-already-in-use')) {
+        errorMessage =
+            'The email address is already in use by another account.';
+      } else if (e.toString().contains('invalid-email')) {
+        errorMessage = 'The email address is not valid.';
+      } else if (e.toString().contains('weak-password')) {
+        errorMessage =
+            'The password is too weak. Please use a stronger password.';
+      }
+      CustomSnackBar().ShowSnackBar(
+        context: context,
+        text: errorMessage,
+      );
+    }
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -31,45 +87,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _phoneNumberController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _signUpUser() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final String res = await AuthService().signupUser(
-        email: _emailController.text,
-        password: _passwordController.text,
-        firstName: _firstNameController.text,
-        lastName: _lastNameController.text,
-        phoneNumber: _phoneNumberController.text,
-      );
-
-      setState(() {
-        isLoading = false;
-      });
-
-      if (res == "Successfully") {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SearchCropScreen(),
-          ),
-        );
-      } else {
-        print('Showing error SnackBar: $res'); // Debug log
-      }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      CustomSnackBar().ShowSnackBar(
-        context: context,
-        text: 'An unexpected error occurred: $e',
-      );
-    }
   }
 
   @override
@@ -122,14 +139,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 15),
               ReusableTextField(
-                hintText: 'Password',
+                hintText: 'Password ',
                 controller: _passwordController,
                 prefixIcon: Icons.lock_outline,
                 isPasswordField: true,
               ),
               const SizedBox(height: 15),
               ReusableTextField(
-                hintText: 'PhoneNumber',
+                hintText: 'Phone Number ',
                 controller: _phoneNumberController,
                 prefixIcon: Icons.phone,
                 keyboardType: TextInputType.phone,
@@ -140,18 +157,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_firstNameController.text.isEmpty ||
-                        _emailController.text.isEmpty ||
-                        _phoneNumberController.text.isEmpty ||
-                        _passwordController.text.isEmpty ||
-                        _lastNameController.text.isEmpty) {
-                      CustomSnackBar().ShowSnackBar(
-                        context: context,
-                        text: "Please fill in all fields",
-                      );
-                    } else {
-                      _signUpUser();
-                    }
+                    _signUpUser();
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(

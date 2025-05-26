@@ -54,6 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       for (var doc in cropSnapshot.docs) {
         var cropData = doc.data() as Map<String, dynamic>;
+        cropData['CropID'] = doc.id;
+
         QuerySnapshot cropDetailSnapshot = await FirebaseFirestore.instance
             .collection('crops')
             .where('name', isEqualTo: cropData['CropName'])
@@ -71,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           cropData['irrigationGuide'] = cropDetails['irrigationGuide'] ?? '';
           cropData['soilType'] = cropDetails['soilType'] ?? '';
           cropData['sunlight'] = cropDetails['sunlight'] ?? '';
-          cropData['type'] = cropDetails['type'] ?? '';
+          cropData['PlantType'] = cropDetails['type'] ?? '';
           cropData['waterRequirement'] = cropDetails['waterRequirement'] ?? '';
         }
         userCrops.add(cropData);
@@ -181,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.red.shade200),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       Text(
                         'Weather data unavailable',

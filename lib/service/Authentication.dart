@@ -32,14 +32,42 @@ class AuthService {
   }
 
   String? validatePhoneNumber(String phoneNumber) {
-    if (!RegExp(r'^\d+$').hasMatch(phoneNumber)) {
+    final trimmed = phoneNumber.trim();
+
+    if (!RegExp(r'^\d+$').hasMatch(trimmed)) {
       return 'Phone number must contain only digits (0-9).';
     }
-    if (phoneNumber.length != 10) {
-      return 'Phone number must be 10 digits.';
+
+    if (!(trimmed.startsWith('07') || trimmed.startsWith('962'))) {
+      return 'Phone number must start with 07 or 962.';
+    }
+
+    if (trimmed.startsWith('07') && trimmed.length != 10) {
+      return 'Phone number starting with 07 must be exactly 10 digits.';
+    }
+
+    if (trimmed.startsWith('962') && trimmed.length != 12) {
+      return 'Phone number starting with 962 must be exactly 12 digits.';
+    }
+
+    return null;
+  }
+
+  String? validateName(String name) {
+    if (name.trim().isEmpty) {
+      return 'Name cannot be empty.';
+    }
+    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(name)) {
+      return 'Name can only contain letters and spaces.';
+    }
+    if (name.length < 2) {
+      return 'Name must be at least 2 characters.';
     }
     return null;
   }
+
+
+
 
   Future<String> signupUser({
     required String email,
@@ -58,16 +86,22 @@ class AuthService {
         return passwordError;
       }
 
-      // Validate email domain
       final emailError = validateEmailDomain(email);
       if (emailError != null) {
         return emailError;
       }
 
-      // Validate phone number
       final phoneError = validatePhoneNumber(phoneNumber);
       if (phoneError != null) {
         return phoneError;
+      }
+      final firstNameError = validateName(firstName);
+      if (firstNameError != null) {
+        return firstNameError;
+      }
+      final lastNameError = validateName(firstName);
+      if (lastNameError != null) {
+        return lastNameError;
       }
 
       // Register user in auth with email and password

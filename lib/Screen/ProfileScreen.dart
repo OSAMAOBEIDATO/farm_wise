@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farm_wise/Screen/HelpAndSupport.dart';
 import 'package:farm_wise/Screen/Notifications.dart';
 import 'package:farm_wise/Screen/SecurityScreen.dart';
 import 'package:farm_wise/service/Authentication.dart';
@@ -272,13 +273,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.share, color: Colors.green),
               title: Text('Share App',
                   style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
-              onTap: () {},
-            ),
+              onTap: () {
+                // Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const ShareScreen()));
+              },
+            ),//HelpAndSupportScreen
             ListTile(
               leading: const Icon(Icons.help, color: Colors.green),
               title: Text('Help & Support',
                   style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const HelpAndSupportScreen()));
+              },
             ),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),

@@ -36,7 +36,8 @@ class _CropDetailsState extends State<CropDetails> {
     bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Crop'),
+        icon: const Icon(Icons.delete,color: Colors.red,size: 34),
+        title: Center(child: Text('Delete Crop',style: GoogleFonts.adamina(fontSize: 25),)),
         content: Text('Are you sure you want to delete ${widget.crop.name}?'),
         actions: [
           TextButton(

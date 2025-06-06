@@ -115,12 +115,12 @@ class _CropDetailsState extends State<CropDetails> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: Image.asset(
-                      'assets/Image/splashScreen.png',
+                      'assets/Image/${widget.crop.name}.jpg',
                       height: 250,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Image.asset(
-                          'assets/Image/splashScreen.png',
+                          'assets/Image/${widget.crop.name}.jpg',
                           height: 250,
                           fit: BoxFit.cover,
                         );

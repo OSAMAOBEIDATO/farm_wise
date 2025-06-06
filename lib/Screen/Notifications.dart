@@ -19,7 +19,7 @@ class _NotificationsCardState extends State<NotificationsCard> {
   bool _isLoading = true;
   String? _userId;
   String? _errorMessage;
-  bool _isNavigatingBack = false; // Add this flag
+  bool _isNavigatingBack = false;
 
   static const fruitColor = Color.fromRGBO(200, 80, 80, 1.0);
   static const vegetableColor = Colors.green;
@@ -178,6 +178,9 @@ class _NotificationsCardState extends State<NotificationsCard> {
   }
 
   Future<void> _markAsCompleted(String docId, int index) async {
+    // Prevent multiple navigation attempts
+    if (_isNavigatingBack) return;
+
     try {
       await FirebaseFirestore.instance
           .collection('users')
@@ -191,18 +194,25 @@ class _NotificationsCardState extends State<NotificationsCard> {
       });
 
       // Check if this was the last notification
-      if (_notifications.isEmpty && !_isNavigatingBack) {
+      if (_notifications.isEmpty) {
         _isNavigatingBack = true;
-        // Show success message and navigate back immediately
+
+        // Show success message
         CustomSnackBar().ShowSnackBar(
             context: context,
             text: 'All tasks completed!'
         );
 
-        // Navigate back immediately
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
+        // Navigate back with proper context check
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && Navigator.canPop(context)) {
             Navigator.pop(context);
+          } else if (mounted) {
+            // If can't pop, replace with MainScreen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainScreen()),
+            );
           }
         });
       } else {
@@ -228,14 +238,20 @@ class _NotificationsCardState extends State<NotificationsCard> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Notifications"),
-        leading: IconButton(onPressed: (){
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const MainScreen(),
-            ),
-          );
-        }, icon: const Icon(Icons.arrow_back)),
+        leading: IconButton(
+            onPressed: () {
+              // Use proper navigation method
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MainScreen()),
+                );
+              }
+            },
+            icon: const Icon(Icons.arrow_back)
+        ),
         backgroundColor: Colors.green[600],
       ),
       body: Card(
@@ -266,7 +282,6 @@ class _NotificationsCardState extends State<NotificationsCard> {
   }
 
   Widget _buildEmptyState() {
-    // Don't auto-navigate here anymore since we handle it in _markAsCompleted
     return Container(
       padding: const EdgeInsets.all(24),
       alignment: Alignment.center,
@@ -279,6 +294,24 @@ class _NotificationsCardState extends State<NotificationsCard> {
           Text('No upcoming events for the next 7 days',
               style: GoogleFonts.adamina(fontSize: 14, color: Colors.grey[600]),
               textAlign: TextAlign.center),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MainScreen()),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Go Back'),
+          ),
         ],
       ),
     );
@@ -368,7 +401,7 @@ class _NotificationsCardState extends State<NotificationsCard> {
                     width: 60,
                     height: 32,
                     child: ElevatedButton(
-                      onPressed: () => _markAsCompleted(docId, index),
+                      onPressed: _isNavigatingBack ? null : () => _markAsCompleted(docId, index),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,

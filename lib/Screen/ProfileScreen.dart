@@ -274,7 +274,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('Share App',
                   style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
               onTap: () {
-                // Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const ShareScreen()));
+                // Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const Sharescreen()));
               },
             ),//HelpAndSupportScreen
             ListTile(

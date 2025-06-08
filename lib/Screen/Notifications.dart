@@ -232,7 +232,7 @@ class _NotificationsCardState extends State<NotificationsCard> {
   IconData _getEventIcon(String eventType) {
     return eventType == 'plant' ? Icons.agriculture : Icons.grass;
   }
-
+//obeidatosama388@gmail.com
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,15 +240,11 @@ class _NotificationsCardState extends State<NotificationsCard> {
         title: const Text("Notifications"),
         leading: IconButton(
             onPressed: () {
-              // Use proper navigation method
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const MainScreen()),
                 );
-              }
+
             },
             icon: const Icon(Icons.arrow_back)
         ),
@@ -297,14 +293,10 @@ class _NotificationsCardState extends State<NotificationsCard> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const MainScreen()),
                 );
-              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,

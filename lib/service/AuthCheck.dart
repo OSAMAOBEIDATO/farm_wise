@@ -20,9 +20,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void initState() {
     super.initState();
-    // Check initial connection state
     _checkInitialConnectivity();
-    // Listen for connection changes
     _setupConnectivityListener();
   }
 
@@ -39,12 +37,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
   void _setupConnectivityListener() {
     internetConnectionStreamSubscription =
         InternetConnection().onStatusChange.listen((status) {
-          if (mounted) {
-            setState(() {
-              isConnectedToInternet = status == InternetStatus.connected;
-            });
-          }
+      if (mounted) {
+        setState(() {
+          isConnectedToInternet = status == InternetStatus.connected;
         });
+      }
+    });
   }
 
   @override
@@ -55,12 +53,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    // Show a loading indicator while checking initial connectivity
     if (isCheckingConnection) {
       return const SpalshScreen();
     }
 
-    // Show no internet connection message when offline
     if (!isConnectedToInternet) {
       return Scaffold(
         body: Center(
@@ -75,8 +71,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
               const SizedBox(height: 16),
               const Text(
                 'No Internet Connection',
-                style: TextStyle(color: Colors.red,fontSize: 18, fontWeight: FontWeight.bold),
-
+                style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text('Please check your connection and try again'),
@@ -88,7 +86,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
                   });
                   await _checkInitialConnectivity();
                 },
-                child: Text('Retry',style: TextStyle(color: Colors.green),),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(color: Colors.green),
+                ),
               ),
             ],
           ),
@@ -104,7 +105,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
         final isLoggedIn = snapshot.hasData && snapshot.data != null;
 
-        return isLoggedIn ? const MainScreen() : const SpalshScreen(); // Fixed typo here
+        return isLoggedIn
+            ? const MainScreen()
+            : const SpalshScreen();
       },
     );
   }

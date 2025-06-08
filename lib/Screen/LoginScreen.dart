@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_wise/Common/Constant.dart';
 import 'package:farm_wise/Screen/ForgetPasswordScreen.dart';
@@ -12,7 +10,7 @@ import 'package:farm_wise/components/FacebookSignUp.dart';
 import 'package:farm_wise/components/ReusableTextField.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import '../Components/ReusableButton.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -54,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } else {
         CustomSnackBar().ShowSnackBar(
@@ -177,13 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 25),
               Image.asset(
                 'assets/Image/loginScreen.jpg',
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.error,
-                    color: Colors.red,
-                    size: 50,
-                  );
-                },
               ),
               const SizedBox(height: 10),
               Text(
@@ -225,34 +216,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 55,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_emailController.text.isEmpty ||
-                        _passwordController.text.isEmpty) {
-                      CustomSnackBar().ShowSnackBar(
-                        context: context,
-                        text: "Please fill in all fields",
-                      );
-                    } else {
-                      _signInUser();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    backgroundColor: Colors.grey[100],
-                  ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.green)
-                      : Text('Sign In', style: KTextStyle),
-                ),
+              const SizedBox(height: 30),
+              ReusableButton(
+               emailController: _emailController,
+                passwordController: _passwordController,
+                isLoading: isLoading,
+                onTap: _signInUser,
+                label: "Sign In",
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30,),
               Row(
                 children: [
                   Expanded(
@@ -285,13 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Don\'t have an account?',
-                    style: GoogleFonts.adamina(
-                      fontSize: 20,
-                      color: Colors.green[500],
-                    ),
-                  ),
+                  Text('Don\'t have an account?', style: KButtomTextStyle),
                   TextButton(
                     onPressed: () {
                       Navigator.push(
@@ -303,10 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       'SignUp',
-                      style: GoogleFonts.adamina(
-                        fontSize: 25,
-                        color: Colors.green[900],
-                      ),
+                      style: KTextBigTitle,
                     ),
                   ),
                 ],

@@ -108,7 +108,19 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      barrierColor: Colors.green,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.green,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
@@ -177,7 +189,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
               int.parse(dateParts[1]),
               int.parse(dateParts[0]),
             );
-            int harvestDays = crop['harvestDate'] ??0 ;
+            int harvestDays = crop['harvestDate'] ?? 0;
             harvestDateTime =
                 plantDateTime.add(Duration(days: harvestDays));
           }
@@ -186,8 +198,6 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             failedCrops.add("${crop['name']} (already in your crops)");
             continue;
           }
-
-
 
           final docRef = await FirebaseFirestore.instance
               .collection("users")
@@ -200,7 +210,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
             'PlantDate': plantDateTime != null ? Timestamp.fromDate(plantDateTime) : null,
             'HarvestDate': harvestDateTime != null ? Timestamp.fromDate(harvestDateTime) : null,
             'fertilizers': crop['fertilizers'] ?? [],
-            'type':crop['type'],
+            'type': crop['type'],
             'createdAt': FieldValue.serverTimestamp(),
           });
           await docRef.update({'CropID': docRef.id});
@@ -243,143 +253,631 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
     }
   }
 
+  Future<void> _refreshData() async {
+    await _waitForAuthAndFetchCrops();
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.green.shade400, Colors.green.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(Icons.search, color: Colors.white, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Discover New Crops',
+                  style: GoogleFonts.roboto(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Find and add crops to your farm',
+                  style: GoogleFonts.roboto(
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: _refreshData,
+            icon: const Icon(Icons.refresh, color: Colors.white, size: 24),
+            tooltip: 'Refresh crops',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        style: GoogleFonts.roboto(fontSize: 16),
+        decoration: InputDecoration(
+          hintText: "Search for crops to add...",
+          hintStyle: GoogleFonts.roboto(
+            color: Colors.grey[500],
+            fontSize: 16,
+          ),
+          prefixIcon: Container(
+            padding: const EdgeInsets.all(12),
+            child: Icon(Icons.search, color: Colors.green[600], size: 24),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCropCard(Map<String, dynamic> crop) {
+    final selected = _selectedCropIds.contains(crop['id']);
+    final isAlreadyAdded = _existingCropNames.contains(crop['name'].toLowerCase());
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: selected
+            ? Border.all(color: Colors.green, width: 2)
+            : Border.all(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: InkWell(
+        onTap: isAlreadyAdded
+            ? () {
+          CustomSnackBar().ShowSnackBar(
+            context: context,
+            text: "${crop['name']} is already in your crops!",
+          );
+        }
+            : () {
+          setState(() {
+            if (selected) {
+              _selectedCropIds.remove(crop['id']);
+            } else {
+              _selectedCropIds.add(crop['id']);
+            }
+          });
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: isAlreadyAdded
+                      ? Colors.grey.withOpacity(0.3)
+                      : (selected ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1)),
+                  image: DecorationImage(
+                    image: AssetImage('assets/Image/${crop['name']}.jpg'),
+                    fit: BoxFit.cover,
+                    onError: (error, stackTrace) {},
+                    colorFilter: isAlreadyAdded
+                        ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
+                        : null,
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: isAlreadyAdded
+                        ? Colors.grey.withOpacity(0.3)
+                        : (selected ? Colors.green.withOpacity(0.1) : Colors.transparent),
+                  ),
+                  child: Center(
+                    child: selected
+                        ? Icon(Icons.check_circle, color: Colors.green[600], size: 24)
+                        : (isAlreadyAdded
+                        ? Icon(Icons.lock, color: Colors.grey[600], size: 24)
+                        : const SizedBox()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      crop['name'],
+                      style: GoogleFonts.roboto(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isAlreadyAdded ? Colors.grey[600] : Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.category, size: 14, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          crop['type'] ?? 'Unknown',
+                          style: GoogleFonts.roboto(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isAlreadyAdded) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Already Added',
+                          style: GoogleFonts.roboto(
+                            fontSize: 10,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (selected && !isAlreadyAdded)
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.check, color: Colors.green[600], size: 20),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateSelectionSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.calendar_today, color: Colors.blue[600], size: 20),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Set Planting Dates',
+                style: GoogleFonts.roboto(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Column(
+            children: _selectedCropIds.map((cropId) {
+              final controller = _plantDateControllers[cropId]!;
+              final crop = _availableCrops.firstWhere((c) => c['id'] == cropId);
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            crop['name'],
+                            style: GoogleFonts.roboto(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          Text(
+                            crop['type'] ?? '',
+                            style: GoogleFonts.roboto(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: controller,
+                        readOnly: true,
+                        style: GoogleFonts.roboto(color: Colors.black),
+                        decoration: InputDecoration(
+                          hintText: "Select planting date",
+                          hintStyle: GoogleFonts.roboto(color: Colors.grey[500]),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                          ),
+                          suffixIcon: Icon(Icons.calendar_today, color: Colors.green[600]),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                        onTap: () => _selectDate(cropId),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.green.shade400, Colors.green.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: isLoading ? null : _saveSelectedCrops,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: isLoading
+            ? const SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(
+            color: Colors.white,
+            strokeWidth: 2,
+          ),
+        )
+            : Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.add_circle, color: Colors.white),
+            const SizedBox(width: 8),
+            Text(
+              "Add Selected Crops (${_selectedCropIds.length})",
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.search,
+              size: 48,
+              color: Colors.green[600],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Search for crops',
+            style: GoogleFonts.roboto(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[700],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Type in the search bar above to discover new crops for your farm',
+            style: GoogleFonts.roboto(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.red.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.error_outline, color: Colors.red[600], size: 32),
+          const SizedBox(height: 12),
+          Text(
+            'Error Loading Crops',
+            style: GoogleFonts.roboto(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.red[700],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            fetchError ?? 'Unknown error occurred',
+            style: GoogleFonts.roboto(
+              fontSize: 14,
+              color: Colors.red[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _refreshData,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[600],
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          "Search Crops",
-          style: GoogleFonts.adamina(fontSize: 20, color: Colors.black),
+          "Add New Crops",
+          style: GoogleFonts.adamina(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green[600],
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isFetchingCrops
           ? const Center(
         child: CircularProgressIndicator(color: Colors.green),
       )
-          : _buildContent(),
-    );
-  }
-
-  Widget _buildContent() {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        children: [
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              iconColor: Colors.black,
-              focusColor: Colors.green,
-              hintText: "Search crops...",
-              hintStyle: const TextStyle(
-                color: Colors.grey,
-                fontSize: 20,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              prefixIcon: const Icon(Icons.search),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _filteredCrops.isEmpty
-              ? const Text("Search to view crops")
-              : Expanded(
-            child: ListView.builder(
-              itemCount: _filteredCrops.length,
-              itemBuilder: (context, index) {
-                final crop = _filteredCrops[index];
-                final selected = _selectedCropIds.contains(crop['id']);
-                final isAlreadyAdded =
-                _existingCropNames.contains(crop['name'].toLowerCase());
-
-                return Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  color: selected
-                      ? Colors.green[50]
-                      : (isAlreadyAdded ? Colors.grey[200] : null),
-                  child: ListTile(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    title: Text(crop['name']),
-                    subtitle: Text("Type: ${crop['type']}"),
-                    trailing: selected
-                        ? const Icon(Icons.check_circle, color: Colors.green)
-                        : (isAlreadyAdded
-                        ? const Icon(Icons.lock, color: Colors.grey)
-                        : null),
-                    onTap: isAlreadyAdded
-                        ? () {
-                      CustomSnackBar().ShowSnackBar(
-                        context: context,
-                        text: "${crop['name']} is already in your crops!",
-                      );
-                    }
-                        : () {
-                      setState(() {
-                        if (selected) {
-                          _selectedCropIds.remove(crop['id']);
-                        } else {
-                          _selectedCropIds.add(crop['id']);
-                        }
-                      });
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-          if (_selectedCropIds.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text("Set Planting Dates:", style: KTextStyle),
-            const SizedBox(height: 8),
-            Column(
-              children: _selectedCropIds.map((cropId) {
-                final controller = _plantDateControllers[cropId]!;
-                final crop =
-                _availableCrops.firstWhere((c) => c['id'] == cropId);
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
+          : RefreshIndicator(
+        onRefresh: _refreshData,
+        color: Colors.green,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 24),
+              _buildSearchBar(),
+              const SizedBox(height: 24),
+              if (fetchError != null)
+                _buildErrorCard()
+              else if (_searchController.text.isEmpty)
+                _buildEmptyState()
+              else if (_filteredCrops.isNotEmpty) ...[
+                  Row(
                     children: [
-                      Expanded(
-                        child: Text(
-                          crop['name'],
-                          style: KTextStyle,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.agriculture, color: Colors.green[600], size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Available Crops',
+                        style: GoogleFonts.roboto(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
                         ),
                       ),
-                      Expanded(
-                        child: TextField(
-                          controller: controller,
-                          style: const TextStyle(color: Colors.black),
-                          readOnly: true,
-                          decoration: const InputDecoration(
-                            hintText: "Select Date",
-                            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-                            suffixIcon: Icon(Icons.calendar_today,color:Colors.black,),
-                            iconColor: Colors.green,
-                            hintStyle: TextStyle(color: Colors.black54),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          '${_filteredCrops.length} found',
+                          style: GoogleFonts.roboto(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.green[700],
                           ),
-                          onTap: () => _selectDate(cropId),
                         ),
                       ),
                     ],
                   ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: isLoading ? null : _saveSelectedCrops,
-              child: isLoading
-                  ? const CircularProgressIndicator(color: Colors.green)
-                  : Text("Save Selected Crops (${_selectedCropIds.length})",
-                  style: KTextStyle),
-            ),
-          ],
-        ],
+                  const SizedBox(height: 16),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _filteredCrops.length,
+                    itemBuilder: (context, index) {
+                      return _buildCropCard(_filteredCrops[index]);
+                    },
+                  ),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.search_off, size: 48, color: Colors.grey[400]),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No crops found',
+                          style: GoogleFonts.roboto(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Try searching with different keywords',
+                          style: GoogleFonts.roboto(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              if (_selectedCropIds.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                _buildDateSelectionSection(),
+                const SizedBox(height: 24),
+                _buildSaveButton(),
+              ],
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
       ),
     );
   }

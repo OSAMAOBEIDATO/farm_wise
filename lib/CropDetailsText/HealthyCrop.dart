@@ -22,9 +22,8 @@ class Healthycrop extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'This crop thrives best in $soilType soil, requires $sunlight sunlight, '
-              'and grows optimally with the use of $fertilizers fertilizers. '
-              'For irrigation, it is categorized as $irrigationCrop.',
+          'This crop grows effectively in $soilType soil and prefers $sunlight '
+              'sunlight to achieve optimal growth. Optimal growth is supported by using $fertilizers fertilizers. ',
           style: KTextStyle,
           textAlign: TextAlign.justify,
         ),
@@ -32,7 +31,6 @@ class Healthycrop extends StatelessWidget {
         buildInfoRow(Icons.landscape, 'Soil Type', soilType, Colors.brown),
         buildInfoRow(Icons.wb_sunny, 'Sunlight', sunlight, Colors.orange),
         buildInfoRow(Icons.eco, 'Fertilizers', fertilizers, Colors.green),
-        buildInfoRow(Icons.water_drop, 'Irrigation', irrigationCrop, Colors.blue),
       ],
     );
   }

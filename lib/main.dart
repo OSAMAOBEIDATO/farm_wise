@@ -2,12 +2,10 @@ import 'package:farm_wise/service/AuthCheck.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp( const FarmWiseApp());
-
 }
 
 class FarmWiseApp extends StatelessWidget {
@@ -16,7 +14,7 @@ class FarmWiseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       title: "Farm Wise App",
       theme: ThemeData(
           primarySwatch: Colors.green,

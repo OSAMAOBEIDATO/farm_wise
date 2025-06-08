@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthService {
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
 
   String? validPassword(String password) {
     if (password.length < 8) {
@@ -49,7 +49,6 @@ class AuthService {
     if (trimmed.startsWith('962') && trimmed.length != 12) {
       return 'Phone number starting with 962 must be exactly 12 digits.';
     }
-
     return null;
   }
 
@@ -65,9 +64,6 @@ class AuthService {
     }
     return null;
   }
-
-
-
 
   Future<String> signupUser({
     required String email,
@@ -104,13 +100,11 @@ class AuthService {
         return lastNameError;
       }
 
-      // Register user in auth with email and password
       UserCredential cred = await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
       );
 
-      // Add user to Firestore
       await _firestore.collection("users").doc(cred.user?.uid).set({
         'firstName': firstName.trim(),
         'lastName': lastName.trim(),
@@ -123,9 +117,9 @@ class AuthService {
     } on FirebaseAuthException catch (err) {
       switch (err.code) {
         case 'email-already-in-use':
-          return 'The email address is already in use by another account.';
+          return 'The email address is already in use by another account';
         case 'invalid-email':
-          return 'Hmm, that doesn’t look like a valid email. Can you double-check it.';
+          return 'Hmm, that doesn’t look like a valid email. ';
         case 'weak-password':
           return 'The password must be at least 8 characters long.';
         case 'operation-not-allowed':

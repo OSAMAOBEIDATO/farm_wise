@@ -1,3 +1,4 @@
+import 'package:farm_wise/Components/ReusableButton.dart';
 import 'package:farm_wise/Components/SnakBar.dart';
 import 'package:farm_wise/Screen/SearchCropScreen.dart';
 import 'package:flutter/material.dart';
@@ -152,23 +153,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 40),
-              SizedBox(
-                height: 55,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _signUpUser();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    backgroundColor: Colors.grey[100],
-                  ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.green)
-                      : Text('Sign Up', style: KTextStyle),
-                ),
+              ReusableButton(
+                emailController: _emailController,
+                passwordController: _passwordController,
+                isLoading: isLoading,
+                onTap: _signUpUser,
+                label: "Sign Up",
               ),
               const SizedBox(height: 20),
               Row(
@@ -176,10 +166,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   Text(
                     'Already have an account?',
-                    style: GoogleFonts.adamina(
-                      fontSize: 20,
-                      color: Colors.green[500],
-                    ),
+                    style:KButtomTextStyle
                   ),
                   TextButton(
                     onPressed: () {
@@ -190,13 +177,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       );
                     },
-                    child: Text(
-                      'Login',
-                      style: GoogleFonts.adamina(
-                        fontSize: 25,
-                        color: Colors.green[900],
-                      ),
-                    ),
+                    child: Text('Login', style: KTextBigTitle),
                   ),
                 ],
               ),

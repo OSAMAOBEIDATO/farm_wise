@@ -28,7 +28,7 @@ class WeatherService {
 
     try {
       return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.best,
         timeLimit: const Duration(seconds: 10),
       );
     } catch (e) {

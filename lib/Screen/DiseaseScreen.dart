@@ -21,9 +21,8 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
 
   // Dependency injection
   final ImagePickerService _imagePickerService = ImagePickerServiceImpl();
-  final ApiService _apiService = ApiServiceImpl('http://192.168.x.x:5000/predict'); // Replace with your Flask server URL
+  final ApiService _apiService = ApiServiceImpl('http://192.168.1.23:5000/predict'); // http://127.0.0.1:5000/predict   Replace with your Flask server URL
 
-  // Pick image from gallery
   Future<void> _pickImageFromGallery() async {
     setState(() {
       _isLoading = true;

@@ -10,6 +10,7 @@ import 'package:farm_wise/components/FacebookSignUp.dart';
 import 'package:farm_wise/components/ReusableTextField.dart';
 import 'package:farm_wise/components/SnakBar.dart';
 import 'package:farm_wise/service/Authentication.dart';
+
 import '../Components/ReusableButton.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -269,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       'SignUp',
-                      style: KTextBigTitle,
+                      style: KTextButton,
                     ),
                   ),
                 ],

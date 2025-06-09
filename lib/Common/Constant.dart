@@ -14,6 +14,11 @@ final KTextBigTitle = GoogleFonts.adamina(
 );
 
 final KButtomTextStyle =  GoogleFonts.adamina(
-  fontSize: 23,
+  fontSize: 21,
   color: Colors.green[500],
+);
+
+final KTextButton=GoogleFonts.adamina(
+  fontSize: 25,
+  color: Colors.green[800],
 );

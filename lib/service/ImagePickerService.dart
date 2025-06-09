@@ -16,17 +16,9 @@ class ImagePickerServiceImpl implements ImagePickerService {
 }
 
 abstract class ApiService {
-  Future<Map<String, dynamic>> predictDisease(String imagePath);
-}
-
-class ApiServiceImpl implements ApiService {
-  final String apiUrl;
-
-  ApiServiceImpl(this.apiUrl);
-
   @override
   Future<Map<String, dynamic>> predictDisease(String imagePath) async {
-    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+    var request = http.MultipartRequest('POST', Uri.parse('http://192.168.1.23:5000/predict'));
     request.files.add(
       await http.MultipartFile.fromPath('file', imagePath),
     );
@@ -41,3 +33,27 @@ class ApiServiceImpl implements ApiService {
     return jsonDecode(responseBody);
   }
 }
+
+class ApiServiceImpl implements ApiService {
+  final String apiUrl;
+
+  ApiServiceImpl(this.apiUrl);
+
+  @override
+  Future<Map<String, dynamic>> predictDisease(String imagePath) async {
+    var uri = Uri.parse(apiUrl);
+    var request = http.MultipartRequest('POST', uri);
+
+    request.files.add(await http.MultipartFile.fromPath('file', imagePath));
+
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return {'error': jsonDecode(response.body)['error'] ?? 'Unexpected error'};
+    }
+  }
+}
+

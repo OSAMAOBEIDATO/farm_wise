@@ -4,6 +4,7 @@ import 'package:farm_wise/service/ImagePickerService.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CropDiseaseDetectionScreen extends StatefulWidget {
   const CropDiseaseDetectionScreen({super.key});
@@ -16,12 +17,15 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
   File? _image;
   String? _diseaseName;
   double? _confidence;
+  String? _cureTreatment;
+  String? _fertilizerRecommendation;
+  String? _irrigationGuidelines;
+  String? _additionalInfo;
   String? _error;
   bool _isLoading = false;
 
-  // Dependency injection
   final ImagePickerService _imagePickerService = ImagePickerServiceImpl();
-  final ApiService _apiService = ApiServiceImpl('http://192.168.1.23:5000/predict'); // http://127.0.0.1:5000/predict   Replace with your Flask server URL
+  final ApiService _apiService = ApiServiceImpl();
 
   Future<void> _pickImageFromGallery() async {
     setState(() {
@@ -29,6 +33,10 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
       _error = null;
       _diseaseName = null;
       _confidence = null;
+      _cureTreatment = null;
+      _fertilizerRecommendation = null;
+      _irrigationGuidelines = null;
+      _additionalInfo = null;
     });
 
     try {
@@ -52,7 +60,6 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
     }
   }
 
-  // Send image to Flask backend
   Future<void> _predictDisease() async {
     if (_image == null) {
       setState(() {
@@ -62,6 +69,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
       return;
     }
 
+    setState(() => _isLoading = true);
     try {
       final response = await _apiService.predictDisease(_image!.path);
       setState(() {
@@ -71,34 +79,71 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
           _confidence = null;
         } else {
           _diseaseName = response['class'];
-          _confidence = response['confidence'].toDouble();
+          _confidence = response['confidence'].toDouble().clamp(0.0, 1.0); // Cap confidence between 0 and 1
           _error = null;
+          _fetchDiseaseDetails(_diseaseName!);
         }
         _isLoading = false;
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white),
-              const SizedBox(width: 10),
-              Text(_error ?? 'Prediction complete!'),
-            ],
-          ),
-          backgroundColor: _error != null ? Colors.red[600] : Colors.green[600],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
     } catch (e) {
       setState(() {
-        _error = 'Error: $e';
+        _error = 'Failed to predict disease: $e';
         _diseaseName = null;
         _confidence = null;
         _isLoading = false;
+      });
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 10),
+            Text(_error ?? 'Prediction complete!'),
+          ],
+        ),
+        backgroundColor: _error != null ? Colors.red[600] : Colors.green[600],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _fetchDiseaseDetails(String diseaseName) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('diseases')
+          .where('diseaseName', isEqualTo: diseaseName)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final data = querySnapshot.docs.first.data();
+        setState(() {
+          _cureTreatment = data['cureTreatment'];
+          _fertilizerRecommendation = data['fertilizerRecommendation'];
+          _irrigationGuidelines = data['irrigationGuidelines'];
+          _additionalInfo = data['additionalInfo'];
+        });
+      } else {
+        setState(() {
+          _error = 'No details found for $diseaseName';
+          _cureTreatment = 'Not available';
+          _fertilizerRecommendation = 'Not available';
+          _irrigationGuidelines = 'Not available';
+          _additionalInfo = 'Not available';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = 'Error fetching details: $e';
+        _cureTreatment = 'Not available';
+        _fertilizerRecommendation = 'Not available';
+        _irrigationGuidelines = 'Not available';
+        _additionalInfo = 'Not available';
       });
     }
   }
@@ -113,7 +158,6 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header section
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -152,10 +196,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                   ],
                 ),
               ),
-
               const SizedBox(height: 25),
-
-              // Image preview area
               Container(
                 height: 320,
                 width: double.infinity,
@@ -211,29 +252,6 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                         color: Colors.grey[500],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.blue[200]!),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.info_outline, size: 16, color: Colors.blue[600]),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Ensure good lighting for best results',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: Colors.blue[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 )
                     : ClipRRect(
@@ -241,30 +259,18 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                   child: Image.file(_image!, fit: BoxFit.cover),
                 ),
               ),
-
               const SizedBox(height: 25),
-
-              // Action buttons
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : () {
-                        // Camera capture logic (to be implemented)
+                      onPressed: _isLoading
+                          ? null
+                          : () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(Icons.camera, color: Colors.white),
-                                const SizedBox(width: 10),
-                                const Text('Camera capture not implemented yet.'),
-                              ],
-                            ),
-                            backgroundColor: Colors.green[600],
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                          const SnackBar(
+                            content: Text('Camera capture not implemented yet.'),
+                            backgroundColor: Colors.green,
                           ),
                         );
                       },
@@ -310,10 +316,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
-
-              // Results section header
               Row(
                 children: [
                   Icon(Icons.analytics, color: Colors.green[700], size: 24),
@@ -328,10 +331,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                   ),
                 ],
               ),
-
               const SizedBox(height: 15),
-
-              // Results card
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -365,7 +365,6 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Disease name with severity indicator
                             Row(
                               children: [
                                 Container(
@@ -417,10 +416,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 20),
-
-                            // Confidence meter
                             Row(
                               children: [
                                 Icon(Icons.speed, color: Colors.green[600], size: 20),
@@ -434,7 +430,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                                   ),
                                 ),
                                 Text(
-                                  '${(_confidence! * 100).toStringAsFixed(0)}%',
+                                  '${(_confidence! * 100).clamp(0, 100).toInt()}%', // Cap at 100%
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -443,10 +439,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 10),
-
-                            // Confidence bar
                             Container(
                               height: 8,
                               decoration: BoxDecoration(
@@ -455,7 +448,7 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                               ),
                               child: FractionallySizedBox(
                                 alignment: Alignment.centerLeft,
-                                widthFactor: _confidence!,
+                                widthFactor: _confidence!.clamp(0.0, 1.0), // Cap width factor
                                 child: Container(
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -466,56 +459,20 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 20),
-
-                            // Recommendation (static for now, can be enhanced)
-                            Container(
-                              padding: const EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                color: Colors.blue[50],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.blue[200]!),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.lightbulb_outline, color: Colors.blue[700], size: 20),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'Recommendation',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue[800],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Apply copper-based fungicide every 7-10 days. Remove affected leaves and ensure good air circulation around plants.',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      color: Colors.blue[700],
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 15),
-
-                            // Action button
+                            if (_cureTreatment != null)
+                              _buildInfoRow('Treatment', _cureTreatment!),
+                            if (_fertilizerRecommendation != null)
+                              _buildInfoRow('Fertilizer', _fertilizerRecommendation!),
+                            if (_irrigationGuidelines != null)
+                              _buildInfoRow('Irrigation', _irrigationGuidelines!),
+                            if (_additionalInfo != null)
+                              _buildInfoRow('Additional Info', _additionalInfo!),
+                            const SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: () {
-                                  // Navigate to detailed treatment page (to be implemented)
-                                },
+                                onPressed: () {},
                                 icon: const Icon(Icons.medical_services, size: 20),
                                 label: Text(
                                   'View Treatment Details',
@@ -548,11 +505,38 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$title: ',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.grey[800],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

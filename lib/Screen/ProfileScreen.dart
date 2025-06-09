@@ -228,7 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.local_florist, color: Colors.green),
               title: Text(
                 'Crop Options',
-                style: GoogleFonts.adamina(fontWeight: FontWeight.normal),
+                style: GoogleFonts.poppins(fontWeight: FontWeight.normal,fontSize: 17),
               ),
               onTap: () {
                 Navigator.push(
@@ -243,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: const Icon(Icons.notifications_none_outlined,
                   color: Colors.green),
               title: Text('Notifications',
-                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.normal,fontSize: 17)),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
@@ -256,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.security, color: Colors.green),
               title: Text('Security',
-                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.normal,fontSize: 17)),
               onTap: () {
                 Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const SecurityScreen()));
               },
@@ -272,7 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.share, color: Colors.green),
               title: Text('Share App',
-                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.normal,fontSize: 17)),
               onTap: () {
                 // Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const Sharescreen()));
               },
@@ -280,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.help, color: Colors.green),
               title: Text('Help & Support',
-                  style: GoogleFonts.adamina(fontWeight: FontWeight.normal)),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.normal,fontSize: 17)),
               onTap: () {
                 Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const HelpAndSupportScreen()));
               },
@@ -288,7 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: Text('Logout',
-                  style: GoogleFonts.adamina(fontWeight: FontWeight.w900)),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w900,fontSize: 20)),
               onTap: _logout,
             ),
           ],

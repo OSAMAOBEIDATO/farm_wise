@@ -26,7 +26,7 @@ class AuthService {
   String? validateEmailDomain(String email) {
     const allowedDomains = ['@gmail.com', '@hotmail.com', '@yahoo.com','@cit.just.edu.jo','outlook.com',];
     if (!allowedDomains.any((domain) => email.toLowerCase().endsWith(domain))) {
-      return 'Your domain is not Valid ';
+      return 'The Email domain is not Valid ';
     }
     return null;
   }

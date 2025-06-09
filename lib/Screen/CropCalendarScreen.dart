@@ -267,7 +267,10 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
               ?  Center(
             child: Text(
               'Select a date to see events',
-              style: GoogleFonts.adamina(fontSize: 20,),
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                color: Colors.green[600],
+              ),
             ),
           )
               : _buildEventsList(),
@@ -322,9 +325,10 @@ class _CropCalendarScreenState extends State<CropCalendarScreen> {
             leading: Icon(eventIcon, color: eventColor),
             title: Text(
               event['title'],
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
+              style:GoogleFonts.poppins(
+                fontSize: 17,
+                color: Colors.black,
+                fontWeight:FontWeight.w600
               ),
             ),
             subtitle: Text(

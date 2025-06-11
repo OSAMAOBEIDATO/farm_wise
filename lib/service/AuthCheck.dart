@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:farm_wise/Screen/MainScreen.dart';
-import 'package:farm_wise/Screen/SplashScreen.dart'; // Fixed typo here
+import 'package:farm_wise/Screen/SplashScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+
 
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});

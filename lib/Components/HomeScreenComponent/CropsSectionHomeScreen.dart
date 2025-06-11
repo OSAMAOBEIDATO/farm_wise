@@ -1,5 +1,4 @@
 import 'package:farm_wise/Components/HomeScreenComponent/EmptyStateForHomeScreen.dart';
-import 'package:farm_wise/Components/HomeScreenComponent/ErrorCardForHomeScreen.dart';
 import 'package:farm_wise/Models/CropData.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -75,12 +74,6 @@ class CropsSection extends StatelessWidget {
               padding: EdgeInsets.all(40),
               child: CircularProgressIndicator(color: Colors.green),
             ),
-          )
-        else if (fetchError != null)
-          ErrorCardForHomeScreen(
-            title: 'Error Title',
-            error: fetchError!,
-            onRetry: onRetry,
           )
         else if (userCrops.isEmpty)
             const EmptyStateForHomeScreen(

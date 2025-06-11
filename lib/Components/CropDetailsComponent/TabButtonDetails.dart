@@ -63,7 +63,7 @@ class TabButtonDetails extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 label,
-                style: GoogleFonts.roboto(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                   color: isActive ? Colors.white : Colors.grey[700],

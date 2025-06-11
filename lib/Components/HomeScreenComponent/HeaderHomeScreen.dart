@@ -49,7 +49,7 @@ class HeaderForHomeScreen extends StatelessWidget {
               children: [
                 Text(
                   greetingData.greeting,
-                  style: GoogleFonts.roboto(
+                  style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -58,7 +58,7 @@ class HeaderForHomeScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Welcome to FarmWise',
-                  style: GoogleFonts.roboto(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     color: Colors.white.withOpacity(0.9),
                   ),
@@ -69,7 +69,6 @@ class HeaderForHomeScreen extends StatelessWidget {
           IconButton(
             onPressed: refreshData,
             icon: const Icon(Icons.refresh, color: Colors.white, size: 24),
-            tooltip: 'Refresh data',
           ),
         ],
       ),

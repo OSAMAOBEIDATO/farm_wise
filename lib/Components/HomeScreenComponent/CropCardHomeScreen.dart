@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CropCardHomeScreen extends StatelessWidget {
-  final CropData crop;
-  final int daysUntilHarvest;
-  final VoidCallback onTap;
-  final String Function(DateTime) formatDate;
 
   const CropCardHomeScreen({super.key,
     required this.crop,
@@ -14,6 +10,10 @@ class CropCardHomeScreen extends StatelessWidget {
     required this.onTap,
     required this.formatDate,
   });
+  final CropData crop;
+  final int daysUntilHarvest;
+  final VoidCallback onTap;
+  final String Function(DateTime) formatDate;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,6 @@ class CropCardHomeScreen extends StatelessWidget {
                   image: DecorationImage(
                     image: AssetImage('assets/Image/${crop.name}.jpg'),
                     fit: BoxFit.cover,
-                    onError: (error, stackTrace) {},
                   ),
                 ),
                 child: Container(
@@ -71,7 +70,7 @@ class CropCardHomeScreen extends StatelessWidget {
                         Expanded(
                           child: Text(
                             crop.name,
-                            style: GoogleFonts.roboto(
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey[800],
@@ -88,7 +87,7 @@ class CropCardHomeScreen extends StatelessWidget {
                             ),
                             child: Text(
                               'Ready!',
-                              style: GoogleFonts.roboto(
+                              style: GoogleFonts.poppins(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -104,7 +103,7 @@ class CropCardHomeScreen extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           crop.type,
-                          style: GoogleFonts.roboto(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.grey[600],
                           ),
@@ -116,7 +115,7 @@ class CropCardHomeScreen extends StatelessWidget {
                           isReadyToHarvest
                               ? 'Harvest now'
                               : '$daysUntilHarvest days left',
-                          style: GoogleFonts.roboto(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: isReadyToHarvest ? Colors.orange : Colors
                                 .grey[600],
@@ -130,7 +129,7 @@ class CropCardHomeScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Planted: ${formatDate(crop.plantDate!)}',
-                      style: GoogleFonts.roboto(
+                      style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: Colors.grey[500],
                       ),

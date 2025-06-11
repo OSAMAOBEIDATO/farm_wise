@@ -17,12 +17,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   List<CropData> _userCrops = [];
   bool _isLoadingCrops = true;
   bool _isLoadingWeather = true;
   String? _fetchError;
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
   Map<String, dynamic>? _weather;
+  List<Map<String, dynamic>> userCropsData = [];
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   bool get wantKeepAlive => true;
@@ -75,8 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
           .collection('crops')
           .get();
 
-      List<Map<String, dynamic>> userCropsData = [];
-
       for (var doc in cropSnapshot.docs) {
         var cropData = doc.data() as Map<String, dynamic>;
         cropData['CropID'] = doc.id;
@@ -121,6 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
+
+
 
   void _showErrorSnackBar(String message) {
     if (mounted) {

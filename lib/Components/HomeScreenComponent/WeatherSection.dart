@@ -79,12 +79,12 @@ class WeatherSection extends StatelessWidget {
           )
         else
           GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount:2 ,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.3,
             children: [
               WeatherCard(
                 icon: Icons.wb_sunny,

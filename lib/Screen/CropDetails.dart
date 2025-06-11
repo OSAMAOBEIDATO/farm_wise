@@ -144,7 +144,7 @@ class _CropDetailsState extends State<CropDetails>
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
@@ -154,7 +154,8 @@ class _CropDetailsState extends State<CropDetails>
               style: GoogleFonts.roboto(
                 color: Colors.white,
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
+
               ),
             ),
           ),
@@ -164,28 +165,15 @@ class _CropDetailsState extends State<CropDetails>
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            // Header gradient
-            Container(
-              height: 40,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.green, Colors.grey[50]!],
-                ),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Crop image
                   CropImageDetails(
                     cropName: widget.crop.name,
                   ),
                   const SizedBox(height: 24),
 
-                  // Tab buttons
                   Row(
                     children: [
                       TabButtonDetails(

@@ -31,6 +31,7 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
   bool isFetchingCrops = true;
   String? fetchError;
   String? _userId;
+  List<String> cropsWithoutDates = [];
 
   @override
   void initState() {
@@ -141,7 +142,6 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
       return;
     }
 
-    List<String> cropsWithoutDates = [];
     for (String cropId in _selectedCropIds) {
       final date = _plantDateControllers[cropId]?.text ?? "";
       if (date.isEmpty) {
@@ -282,16 +282,6 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
     );
   }
 
-  Widget _buildDateSelectionSection() {
-    return DateSelectionSection(
-      selectedCropIds: _selectedCropIds,
-      availableCrops: _availableCrops,
-      plantDateControllers: _plantDateControllers,
-      onDateSelected: _selectDate,
-    );
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -415,7 +405,12 @@ class _SearchCropScreenState extends State<SearchCropScreen> {
                     ],
                     if (_selectedCropIds.isNotEmpty) ...[
                       const SizedBox(height: 24),
-                      _buildDateSelectionSection(),
+                      DateSelectionSection(
+                        selectedCropIds: _selectedCropIds,
+                        availableCrops: _availableCrops,
+                        plantDateControllers: _plantDateControllers,
+                        onDateSelected: _selectDate,
+                      ),
                       const SizedBox(height: 24),
                       SaveButton(
                         isLoading: isLoading,

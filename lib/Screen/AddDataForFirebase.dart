@@ -9,196 +9,340 @@ class PopulateDiseasesScreen extends StatelessWidget {
 
   /// Adds sample diseases to the Firestore 'diseases' collection
   Future<void> _populateDiseases(BuildContext context) async {
-    final List<Map<String, dynamic>> sampleDiseases = [
+    final List<Map<String, dynamic>> sampleDiseases =
+    [
       {
-        'diseaseName': 'Apple___Apple_scab',
-        'cureTreatment': 'Apply fungicides like sulfur or myclobutanil. Prune infected branches.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in humid climates. Remove fallen leaves to prevent spread.'
+        "DiseaseName": "Apple___Apple_scab",
+        "Cure/Treatment": "Apply fungicides like sulfur or myclobutanil. Prune infected branches.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in humid climates. Remove fallen leaves to prevent spread."
       },
       {
-        'diseaseName': 'Apple___Black_rot',
-        'cureTreatment': 'Apply fungicides like captan. Remove and destroy infected fruit and branches.',
-        'fertilizerRecommendation': 'Potassium-rich fertilizer (0-0-50)',
-        'irrigationGuidelines': 'Water deeply but infrequently to avoid waterlogging.',
-        'additionalInfo': 'Common in warm, wet weather. Prune for better air circulation.'
+        "DiseaseName": "Apple___Black_rot",
+        "Cure/Treatment": "Apply fungicides like captan. Remove and destroy infected fruit and branches.",
+        "Fertilizer Recommendation": "Potassium-rich fertilizer (0-0-50)",
+        "Irrigation Guidelines": "Water deeply but infrequently to avoid waterlogging.",
+        "Additional Info": "Common in warm, wet weather. Prune for better air circulation."
       },
       {
-        'diseaseName': 'Apple___Cedar_apple_rust',
-        'cureTreatment': 'Apply fungicides like triadimefon. Remove nearby juniper plants.',
-        'fertilizerRecommendation': 'Calcium-rich fertilizer',
-        'irrigationGuidelines': 'Avoid overwatering; ensure proper drainage.',
-        'additionalInfo': 'Requires both apple and juniper plants to complete its life cycle.'
+        "DiseaseName": "Apple___Cedar_apple_rust",
+        "Cure/Treatment": "Apply fungicides like triadimefon. Remove nearby juniper plants.",
+        "Fertilizer Recommendation": "Calcium-rich fertilizer",
+        "Irrigation Guidelines": "Avoid overwatering; ensure proper drainage.",
+        "Additional Info": "Requires both apple and juniper plants to complete its life cycle."
       },
       {
-        'diseaseName': 'Cherry_(including_sour)___Powdery_mildew',
-        'cureTreatment': 'Apply sulfur or potassium bicarbonate. Prune infected areas.',
-        'fertilizerRecommendation': 'Low-nitrogen fertilizer',
-        'irrigationGuidelines': 'Water early in the day to allow leaves to dry.',
-        'additionalInfo': 'Thrives in high humidity and moderate temperatures.'
+        "DiseaseName": "Cherry_(including_sour)___Powdery_mildew",
+        "Cure/Treatment": "Apply sulfur or potassium bicarbonate. Prune infected areas.",
+        "Fertilizer Recommendation": "Low-nitrogen fertilizer",
+        "Irrigation Guidelines": "Water early in the day to allow leaves to dry.",
+        "Additional Info": "Thrives in high humidity and moderate temperatures."
       },
       {
-        'diseaseName': 'Corn_(maize)___Cercospora_leaf_spot_Gray_leaf_spot',
-        'cureTreatment': 'Apply fungicides like azoxystrobin. Rotate crops.',
-        'fertilizerRecommendation': 'Nitrogen-rich fertilizer (30-0-0)',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in warm, humid conditions. Remove crop debris after harvest.'
+        "DiseaseName": "Corn_(maize)___Cercospora_leaf_spot_Gray_leaf_spot",
+        "Cure/Treatment": "Apply fungicides like azoxystrobin. Rotate crops.",
+        "Fertilizer Recommendation": "Nitrogen-rich fertilizer (30-0-0)",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in warm, humid conditions. Remove crop debris after harvest."
       },
       {
-        'diseaseName': 'Corn_(maize)___Common_rust_',
-        'cureTreatment': 'Apply fungicides like chlorothalonil. Plant resistant varieties.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (15-15-15)',
-        'irrigationGuidelines': 'Water moderately; avoid water stress.',
-        'additionalInfo': 'Spread by wind. Common in cool, wet weather.'
+        "DiseaseName": "Corn_(maize)___Common_rust_",
+        "Cure/Treatment": "Apply fungicides like chlorothalonil. Plant resistant varieties.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (15-15-15)",
+        "Irrigation Guidelines": "Water moderately; avoid water stress.",
+        "Additional Info": "Spread by wind. Common in cool, wet weather."
       },
       {
-        'diseaseName': 'Corn_(maize)___Northern_Leaf_Blight',
-        'cureTreatment': 'Apply fungicides like mancozeb. Rotate crops and remove debris.',
-        'fertilizerRecommendation': 'Phosphorus-rich fertilizer (0-20-0)',
-        'irrigationGuidelines': 'Avoid overwatering; ensure proper drainage.',
-        'additionalInfo': 'Thrives in wet, humid conditions. Plant resistant varieties.'
+        "DiseaseName": "Corn_(maize)___Northern_Leaf_Blight",
+        "Cure/Treatment": "Apply fungicides like mancozeb. Rotate crops and remove debris.",
+        "Fertilizer Recommendation": "Phosphorus-rich fertilizer (0-20-0)",
+        "Irrigation Guidelines": "Avoid overwatering; ensure proper drainage.",
+        "Additional Info": "Thrives in wet, humid conditions. Plant resistant varieties."
       },
       {
-        'diseaseName': 'Grape___Black_rot',
-        'cureTreatment': 'Apply fungicides like mancozeb. Remove infected fruit and leaves.',
-        'fertilizerRecommendation': 'Potassium-rich fertilizer (0-0-50)',
-        'irrigationGuidelines': 'Water deeply but infrequently to avoid waterlogging.',
-        'additionalInfo': 'Common in warm, wet weather. Prune for better air circulation.'
+        "DiseaseName": "Grape___Black_rot",
+        "Cure/Treatment": "Apply fungicides like mancozeb. Remove infected fruit and leaves.",
+        "Fertilizer Recommendation": "Potassium-rich fertilizer (0-0-50)",
+        "Irrigation Guidelines": "Water deeply but infrequently to avoid waterlogging.",
+        "Additional Info": "Common in warm, wet weather. Prune for better air circulation."
       },
       {
-        'diseaseName': 'Grape___Esca_(Black_Measles)',
-        'cureTreatment': 'Prune infected wood and apply fungicides like thiophanate-methyl.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Avoid overwatering; ensure proper drainage.',
-        'additionalInfo': 'A fungal disease that affects older vines.'
+        "DiseaseName": "Grape___Esca_(Black_Measles)",
+        "Cure/Treatment": "Prune infected wood and apply fungicides like thiophanate-methyl.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Avoid overwatering; ensure proper drainage.",
+        "Additional Info": "A fungal disease that affects older vines."
       },
       {
-        'diseaseName': 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)',
-        'cureTreatment': 'Apply fungicides like copper-based sprays. Remove infected leaves.',
-        'fertilizerRecommendation': 'Calcium-rich fertilizer',
-        'irrigationGuidelines': 'Water early in the day to allow leaves to dry.',
-        'additionalInfo': 'Common in warm, humid climates.'
+        "DiseaseName": "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+        "Cure/Treatment": "Apply fungicides like copper-based sprays. Remove infected leaves.",
+        "Fertilizer Recommendation": "Calcium-rich fertilizer",
+        "Irrigation Guidelines": "Water early in the day to allow leaves to dry.",
+        "Additional Info": "Common in warm, humid climates."
       },
       {
-        'diseaseName': 'Orange___Haunglongbing_(Citrus_greening)',
-        'cureTreatment': 'Remove infected trees. Control psyllid insects with insecticides.',
-        'fertilizerRecommendation': 'Citrus-specific fertilizer (8-3-9)',
-        'irrigationGuidelines': 'Water regularly; avoid water stress.',
-        'additionalInfo': 'Caused by bacteria spread by psyllid insects. No cure once infected.'
+        "DiseaseName": "Orange___Haunglongbing_(Citrus_greening)",
+        "Cure/Treatment": "Remove infected trees. Control psyllid insects with insecticides.",
+        "Fertilizer Recommendation": "Citrus-specific fertilizer (8-3-9)",
+        "Irrigation Guidelines": "Water regularly; avoid water stress.",
+        "Additional Info": "Caused by bacteria spread by psyllid insects. No cure once infected."
       },
       {
-        'diseaseName': 'Peach___Bacterial_spot',
-        'cureTreatment': 'Apply copper-based sprays. Prune infected branches.',
-        'fertilizerRecommendation': 'Low-nitrogen fertilizer',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in warm, wet weather. Plant resistant varieties.'
+        "DiseaseName": "Peach___Bacterial_spot",
+        "Cure/Treatment": "Apply copper-based sprays. Prune infected branches.",
+        "Fertilizer Recommendation": "Low-nitrogen fertilizer",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in warm, wet weather. Plant resistant varieties."
       },
       {
-        'diseaseName': 'PepPepper,_bell___Bacterial_spot',
-        'cureTreatment' : 'Apply copper-based sprays. Remove infected plants.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Water early in the day to allow leaves to dry.',
-        'additionalInfo': 'Spread by rain, wind, and contaminated tools.'
+        "DiseaseName": "Pepper,_bell___Bacterial_spot",
+        "Cure/Treatment": "Apply copper-based sprays. Remove infected plants.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water early in the day to allow leaves to dry.",
+        "Additional Info": "Spread by rain, wind, and contaminated tools."
       },
       {
-        'diseaseName': 'Pepper,_bell___healthy',
-        'cureTreatment': 'N/A',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Water regularly; avoid water stress.',
-        'additionalInfo': 'Healthy plants require proper care and monitoring.'
+        "DiseaseName": "Pepper,_bell___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly; avoid water stress.",
+        "Additional Info": "Healthy plants require proper care and monitoring."
       },
       {
-        'diseaseName': 'Potato___Early_blight',
-        'cureTreatment': 'Apply fungicides like chlorothalonil. Rotate crops.',
-        'fertilizerRecommendation': 'Potassium-rich fertilizer (0-0-50)',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in warm, humid conditions. Remove infected leaves.'
+        "DiseaseName": "Potato___Early_blight",
+        "Cure/Treatment": "Apply fungicides like chlorothalonil. Rotate crops.",
+        "Fertilizer Recommendation": "Potassium-rich fertilizer (0-0-50)",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in warm, humid conditions. Remove infected leaves."
       },
       {
-        'diseaseName': 'Potato___Late_blight',
-        'cureTreatment': 'Apply fungicides like mancozeb. Remove and destroy infected plants.',
-        'fertilizerRecommendation': 'Phosphorus-rich fertilizer (0-20-0)',
-        'irrigationGuidelines': 'Avoid overwatering; ensure proper drainage.',
-        'additionalInfo': 'Caused by the same pathogen as the Irish Potato Famine.'
+        "DiseaseName": "Potato___Late_blight",
+        "Cure/Treatment": "Apply fungicides like mancozeb. Remove and destroy infected plants.",
+        "Fertilizer Recommendation": "Phosphorus-rich fertilizer (0-20-0)",
+        "Irrigation Guidelines": "Avoid overwatering; ensure proper drainage.",
+        "Additional Info": "Caused by the same pathogen as the Irish Potato Famine."
       },
       {
-        'diseaseName': 'Squash___Powdery_mildew',
-        'cureTreatment': 'Apply sulfur or potassium bicarbonate. Prune infected areas.',
-        'fertilizerRecommendation': 'Low-nitrogen fertilizer',
-        'irrigationGuidelines': 'Water early in the day to allow leaves to dry.',
-        'additionalInfo': 'Thrives in high humidity and moderate temperatures.'
+        "DiseaseName": "Squash___Powdery_mildew",
+        "Cure/Treatment": "Apply sulfur or potassium bicarbonate. Prune infected areas.",
+        "Fertilizer Recommendation": "Low-nitrogen fertilizer",
+        "Irrigation Guidelines": "Water early in the day to allow leaves to dry.",
+        "Additional Info": "Thrives in high humidity and moderate temperatures."
       },
       {
-        'diseaseName': 'Strawberry___Leaf_scorch',
-        'cureTreatment': 'Apply fungicides like thiophanate-methyl. Remove infected leaves.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in warm, humid conditions. Plant resistant varieties.'
+        "DiseaseName": "Strawberry___Leaf_scorch",
+        "Cure/Treatment": "Apply fungicides like thiophanate-methyl. Remove infected leaves.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in warm, humid conditions. Plant resistant varieties."
       },
       {
-        'diseaseName': 'Tomato___Bacterial_spot',
-        'cureTreatment': 'Apply copper-based sprays. Remove infected plants.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Water early in the day to allow leaves to dry.',
-        'additionalInfo': 'Spread by rain, wind, and contaminated tools.'
+        "DiseaseName": "Tomato___Bacterial_spot",
+        "Cure/Treatment": "Apply copper-based sprays. Remove infected plants.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water early in the day to allow leaves to dry.",
+        "Additional Info": "Spread by rain, wind, and contaminated tools."
       },
       {
-        'diseaseName': 'Tomato___Early_blight',
-        'cureTreatment': 'Apply fungicides like chlorothalonil. Rotate crops.',
-        'fertilizerRecommendation': 'Potassium-rich fertilizer (0-0-50)',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in warm, humid conditions. Remove infected leaves.'
+        "DiseaseName": "Tomato___Early_blight",
+        "Cure/Treatment": "Apply fungicides like chlorothalonil. Rotate crops.",
+        "Fertilizer Recommendation": "Potassium-rich fertilizer (0-0-50)",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in warm, humid conditions. Remove infected leaves."
       },
       {
-        'diseaseName': 'Tomato___Late_blight',
-        'cureTreatment': 'Apply fungicides like mancozeb. Remove and destroy infected plants.',
-        'fertilizerRecommendation': 'Phosphorus-rich fertilizer (0-20-0)',
-        'irrigationGuidelines': 'Avoid overwatering; ensure proper drainage.',
-        'additionalInfo': 'Caused by the same pathogen as the Irish Potato Famine.'
+        "DiseaseName": "Tomato___Late_blight",
+        "Cure/Treatment": "Apply fungicides like mancozeb. Remove and destroy infected plants.",
+        "Fertilizer Recommendation": "Phosphorus-rich fertilizer (0-20-0)",
+        "Irrigation Guidelines": "Avoid overwatering; ensure proper drainage.",
+        "Additional Info": "Caused by the same pathogen as the Irish Potato Famine."
       },
       {
-        'diseaseName': 'Tomato___Leaf_Mold',
-        'cureTreatment': 'Apply fungicides like chlorothalonil. Prune for better air circulation.',
-        'fertilizerRecommendation': 'Calcium-rich fertilizer',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Thrives in high humidity and poor air circulation.'
+        "DiseaseName": "Tomato___Leaf_Mold",
+        "Cure/Treatment": "Apply fungicides like chlorothalonil. Prune for better air circulation.",
+        "Fertilizer Recommendation": "Calcium-rich fertilizer",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Thrives in high humidity and poor air circulation."
       },
       {
-        'diseaseName': 'Tomato___Septoria_leaf_spot',
-        'cureTreatment': 'Apply fungicides like mancozeb. Remove infected leaves.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in warm, wet weather. Remove crop debris after harvest.'
+        "DiseaseName": "Tomato___Septoria_leaf_spot",
+        "Cure/Treatment": "Apply fungicides like mancozeb. Remove infected leaves.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in warm, wet weather. Remove crop debris after harvest."
       },
       {
-        'diseaseName': 'Tomato___Spider_mites_Two-spotted_spider_mite',
-        'cureTreatment': 'Apply miticides like neem oil. Increase humidity.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Water regularly; avoid water stress.',
-        'additionalInfo': 'Thrives in dry, hot conditions. Keep plants well-watered.'
+        "DiseaseName": "Tomato___Spider_mites_Two-spotted_spider_mite",
+        "Cure/Treatment": "Apply miticides like neem oil. Increase humidity.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly; avoid water stress.",
+        "Additional Info": "Thrives in dry, hot conditions. Keep plants well-watered."
       },
       {
-        'diseaseName': 'Tomato___Target_Spot',
-        'cureTreatment': 'Apply fungicides like chlorothalonil. Remove infected leaves.',
-        'fertilizerRecommendation': 'Potassium-rich fertilizer (0-0-50)',
-        'irrigationGuidelines': 'Avoid overhead irrigation; use drip irrigation.',
-        'additionalInfo': 'Common in warm, humid conditions. Plant resistant varieties.'
+        "DiseaseName": "Tomato___Target_Spot",
+        "Cure/Treatment": "Apply fungicides like chlorothalonil. Remove infected leaves.",
+        "Fertilizer Recommendation": "Potassium-rich fertilizer (0-0-50)",
+        "Irrigation Guidelines": "Avoid overhead irrigation; use drip irrigation.",
+        "Additional Info": "Common in warm, humid conditions. Plant resistant varieties."
       },
       {
-        'diseaseName': 'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
-        'cureTreatment': 'Control whiteflies with insecticides. Remove infected plants.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Water regularly; avoid water stress.',
-        'additionalInfo': 'Spread by whiteflies. No cure once infected.'
+        "DiseaseName": "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+        "Cure/Treatment": "Control whiteflies with insecticides. Remove infected plants.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly; avoid water stress.",
+        "Additional Info": "Spread by whiteflies. No cure once infected."
       },
       {
-        'diseaseName': 'Tomato___Tomato_mosaic_virus',
-        'cureTreatment': 'Remove infected plants. Control aphids with insecticides.',
-        'fertilizerRecommendation': 'Balanced NPK fertilizer (10-10-10)',
-        'irrigationGuidelines': 'Water regularly; avoid water stress.',
-        'additionalInfo': 'Spread by aphids and contaminated tools. No cure once infected.'
+        "DiseaseName": "Tomato___Tomato_mosaic_virus",
+        "Cure/Treatment": "Remove infected plants. Control aphids with insecticides.",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly; avoid water stress.",
+        "Additional Info": "Spread by aphids and contaminated tools. No cure once infected."
+      },
+      {
+        "DiseaseName": "Cherry_(including_sour)___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly but avoid waterlogging.",
+        "Additional Info": "Healthy trees require full sun and well-drained soil."
+      },
+      {
+        "DiseaseName": "Corn_(maize)___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Nitrogen-rich fertilizer (30-0-0)",
+        "Irrigation Guidelines": "Water moderately during growing season.",
+        "Additional Info": "Ensure adequate sunlight and spacing for air circulation."
+      },
+      {
+        "DiseaseName": "Grape___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water deeply; avoid wetting the leaves.",
+        "Additional Info": "Healthy vines benefit from annual pruning."
+      },
+      {
+        "DiseaseName": "Peach___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Low-nitrogen fertilizer",
+        "Irrigation Guidelines": "Water regularly; mulch to retain moisture.",
+        "Additional Info": "Good airflow and sun exposure are important."
+      },
+      {
+        "DiseaseName": "Potato___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Potassium-rich fertilizer (0-0-50)",
+        "Irrigation Guidelines": "Keep soil evenly moist, not soggy.",
+        "Additional Info": "Rotate crops to maintain soil health."
+      },
+      {
+        "DiseaseName": "Raspberry___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly; avoid overhead watering.",
+        "Additional Info": "Proper pruning improves yield and health."
+      },
+      {
+        "DiseaseName": "Soybean___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Inoculated with rhizobia; use phosphorus-rich fertilizer if needed.",
+        "Irrigation Guidelines": "Maintain consistent moisture during flowering.",
+        "Additional Info": "Healthy soybeans fix nitrogen naturally."
+      },
+      {
+        "DiseaseName": "Strawberry___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Drip irrigation preferred to keep leaves dry.",
+        "Additional Info": "Regular weeding and mulching help prevent disease."
+      },
+      {
+        "DiseaseName": "Tomato___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water at base; avoid wetting leaves.",
+        "Additional Info": "Staking and pruning improve growth and airflow."
+      },
+      {
+        "DiseaseName": "Blueberry___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Acid-loving plant fertilizer (e.g., 12-4-8)",
+        "Irrigation Guidelines": "Keep soil moist and acidic (pH 4.5–5.5).",
+        "Additional Info": "Mulch with pine needles or bark to maintain acidity."
+      },
+
+
+      {
+        "DiseaseName": "Cherry_(including_sour)___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly but avoid waterlogging.",
+        "Additional Info": "Healthy trees require full sun and well-drained soil."
+      },
+      {
+        "DiseaseName": "Corn_(maize)___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Nitrogen-rich fertilizer (30-0-0)",
+        "Irrigation Guidelines": "Water moderately during growing season.",
+        "Additional Info": "Ensure adequate sunlight and spacing for air circulation."
+      },
+      {
+        "DiseaseName": "Grape___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water deeply; avoid wetting the leaves.",
+        "Additional Info": "Healthy vines benefit from annual pruning."
+      },
+      {
+        "DiseaseName": "Peach___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Low-nitrogen fertilizer",
+        "Irrigation Guidelines": "Water regularly; mulch to retain moisture.",
+        "Additional Info": "Good airflow and sun exposure are important."
+      },
+      {
+        "DiseaseName": "Potato___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Potassium-rich fertilizer (0-0-50)",
+        "Irrigation Guidelines": "Keep soil evenly moist, not soggy.",
+        "Additional Info": "Rotate crops to maintain soil health."
+      },
+      {
+        "DiseaseName": "Raspberry___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water regularly; avoid overhead watering.",
+        "Additional Info": "Proper pruning improves yield and health."
+      },
+      {
+        "DiseaseName": "Soybean___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Inoculated with rhizobia; use phosphorus-rich fertilizer if needed.",
+        "Irrigation Guidelines": "Maintain consistent moisture during flowering.",
+        "Additional Info": "Healthy soybeans fix nitrogen naturally."
+      },
+      {
+        "DiseaseName": "Strawberry___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Drip irrigation preferred to keep leaves dry.",
+        "Additional Info": "Regular weeding and mulching help prevent disease."
+      },
+      {
+        "DiseaseName": "Tomato___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Balanced NPK fertilizer (10-10-10)",
+        "Irrigation Guidelines": "Water at base; avoid wetting leaves.",
+        "Additional Info": "Staking and pruning improve growth and airflow."
+      },
+      {
+        "DiseaseName": "Blueberry___healthy",
+        "Cure/Treatment": "N/A",
+        "Fertilizer Recommendation": "Acid-loving plant fertilizer (e.g., 12-4-8)",
+        "Irrigation Guidelines": "Keep soil moist and acidic (pH 4.5–5.5).",
+        "Additional Info": "Mulch with pine needles or bark to maintain acidity."
       }
+
     ];
 
     try {

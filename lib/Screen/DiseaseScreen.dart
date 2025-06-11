@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
+import 'package:farm_wise/Components/_buildInfoRowDis.dart';
 import 'package:farm_wise/service/ImagePickerService.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CropDiseaseDetectionScreen extends StatefulWidget {
@@ -116,17 +115,17 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('diseases')
-          .where('diseaseName', isEqualTo: diseaseName)
+          .where('DiseaseName', isEqualTo: diseaseName)
           .limit(1)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         final data = querySnapshot.docs.first.data();
         setState(() {
-          _cureTreatment = data['cureTreatment'];
-          _fertilizerRecommendation = data['fertilizerRecommendation'];
-          _irrigationGuidelines = data['irrigationGuidelines'];
-          _additionalInfo = data['additionalInfo'];
+          _cureTreatment = data['Cure/Treatment'];
+          _fertilizerRecommendation = data['Fertilizer Recommendation'];
+          _irrigationGuidelines = data['Irrigation Guidelines'];
+          _additionalInfo = data['Additional Info'];
         });
       } else {
         setState(() {
@@ -461,36 +460,15 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
                             ),
                             const SizedBox(height: 20),
                             if (_cureTreatment != null)
-                              _buildInfoRow('Treatment', _cureTreatment!),
+                              buildInfoRowDis('Treatment', _cureTreatment!),
                             if (_fertilizerRecommendation != null)
-                              _buildInfoRow('Fertilizer', _fertilizerRecommendation!),
+                              buildInfoRowDis('Fertilizer', _fertilizerRecommendation!),
                             if (_irrigationGuidelines != null)
-                              _buildInfoRow('Irrigation', _irrigationGuidelines!),
+                              buildInfoRowDis('Irrigation', _irrigationGuidelines!),
                             if (_additionalInfo != null)
-                              _buildInfoRow('Additional Info', _additionalInfo!),
+                              buildInfoRowDis('Additional Info', _additionalInfo!),
                             const SizedBox(height: 20),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () {},
-                                icon: const Icon(Icons.medical_services, size: 20),
-                                label: Text(
-                                  'View Treatment Details',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green[600],
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
-                            ),
+
                           ],
                         )
                       else
@@ -509,34 +487,6 @@ class _CropDiseaseDetectionScreenState extends State<CropDiseaseDetectionScreen>
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$title: ',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.grey[800],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
